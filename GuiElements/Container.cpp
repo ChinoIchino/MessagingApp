@@ -70,9 +70,31 @@ bool Container::handleMouseInput(int x, int y){
             result = true;
         }
     }
-
     return result;
 }
+bool Container::handleTextInput(std::string input, SDL_Renderer* renderer){
+    for(TextField* textField: this->guiTextFields){
+        if(textField->isSelected()){
+            textField->addToTextContainer(input);
+            textField->render(renderer);
+            return true;
+        }
+    }
+    return false;
+}
+bool Container::handleKeyInput(SDL_Keycode key, SDL_Renderer* renderer){
+    for(TextField* textField: this->guiTextFields){
+        if(textField->isSelected()){
+            if(key == SDLK_BACKSPACE){
+                textField->removeFromTextContainer();
+                textField->render(renderer);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 std::vector<TextField*> Container::getTextFieldList() const{
     return this->guiTextFields;
@@ -107,6 +129,31 @@ int Container::getHeight(){
 }
 int Container::getWidth(){
     return this->rect.w;
+}
+
+int Container::getAbsolutePositionX(AbsolutePositionX absX){
+    if(absX == LEFT_X){
+        return this->rect.x;
+    }
+    if(absX == MIDDLE_X){
+        return this->rect.x + (this->rect.w / 2);
+    }
+    if(absX == RIGHT_X){
+        return this->rect.x + rect.w;
+    }
+    return 0;
+}
+int Container::getAbsolutePositionY(AbsolutePositionY absY){
+    if(absY == TOP_Y){
+        return this->rect.y;
+    }
+    if(absY == MIDDLE_Y){
+        return this->rect.y + (this->rect.h / 2);
+    }
+    if(absY == BOTTOM_Y){
+        return this->rect.y + rect.h;
+    }
+    return 0;
 }
 
 

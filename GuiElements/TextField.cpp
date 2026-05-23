@@ -28,11 +28,11 @@ TextField::~TextField(){
     }
 }
 
-bool TextField::getIsSelected() const{
-    return this->isSelected;
+bool TextField::isSelected() const{
+    return this->selected;
 }
 void TextField::setIsSelected(bool newStatus){
-    this->isSelected = newStatus;
+    this->selected = newStatus;
 }
 
 bool TextField::isVisible() const{
@@ -173,11 +173,6 @@ void TextField::addToTextContainer(std::string toAdd){
  * Remove a singular char from the text container
  */
 void TextField::removeFromTextContainer(){
-    // if(this->textContainer.size() > 1){
-    //     this->textContainer = this->textContainer.substr(0, this->textContainer.size() - 1);
-    // }else{
-    //     this->textContainer.clear();
-    // }
     if(this->textContainer.empty()){
         return;
     }

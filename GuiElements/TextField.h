@@ -7,11 +7,17 @@ class TextField{
         TextField(SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor);
         ~TextField();
 
+        /**
+         * @param toAdd string of text that will be added to the current textContainer
+         * This function render instantly after updating the textContainer.
+         */
         void addToTextContainer(std::string toAdd);
+        /** This function render instantly after updating the textContainer. */
         void removeFromTextContainer();
+        /** This function render instantly after updating the textContainer. */
         void clearTextContainer();
 
-        bool getIsSelected() const;
+        bool isSelected() const;
         void setIsSelected(bool isSelected);
 
         std::string getTextContainer() const;
@@ -52,5 +58,5 @@ class TextField{
 
         bool visible;
         /** If the user have selected this */
-        bool isSelected;
+        bool selected;
 };

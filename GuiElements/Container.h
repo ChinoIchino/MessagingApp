@@ -10,6 +10,17 @@
 
 class Container{
     public:
+        enum AbsolutePositionX{
+            LEFT_X,
+            MIDDLE_X,
+            RIGHT_X
+        };
+        enum AbsolutePositionY{
+            TOP_Y,
+            MIDDLE_Y,
+            BOTTOM_Y
+        };
+
         Container(
             SDL_Rect rect,
             SDL_Color backgroundColor
@@ -34,12 +45,17 @@ class Container{
         int getHeight();
 
         bool handleMouseInput(int x, int y);
+        bool handleTextInput(std::string input, SDL_Renderer* renderer);
+        bool handleKeyInput(SDL_Keycode key, SDL_Renderer* renderer);
 
         bool isVisible() const;
         void setIsVisible(bool isVisible);
 
         bool isHandlingInput() const;
         void setHandleInput(bool isHandling);
+
+        int getAbsolutePositionX(AbsolutePositionX absX);
+        int getAbsolutePositionY(AbsolutePositionY absY);
 
     private:
         SDL_Rect rect;
