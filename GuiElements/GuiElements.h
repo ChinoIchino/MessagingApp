@@ -1,6 +1,4 @@
-#include "TextField.h"
-#include "TextButton.h"
-#include "Label.h"
+#include "Container.h"
 #include <vector>
 
 /**
@@ -28,29 +26,15 @@ class GuiElements{
             return this->WINDOW_HEIGHT;
         }
 
-        /** Get all the text fiels that was added to guiTextFields */
-        std::vector<TextField*> getTextFieldList() const;
-        /** Add to the guiTextFields a new textField */
-        void addTextField(TextField* textField);
-
-        std::vector<TextButton*> getTextButtonsList() const;
-        void addTextButton(TextButton* textButton);
-
-        std::vector<Label*> getLabelsList() const;
-        void addLabel(Label* label);
+        std::vector<Container*> getContainerList() const;
+        void addContainer(Container* container);
 
         /** Render all the elements that was added to this object */
         void renderAll(SDL_Renderer* renderer);
 
-        // Old logic (to delete soon)
-        // virtual void render(SDL_Renderer* renderer) {};
-        // virtual bool isInside(int x, int y) {return NULL;};
     private: 
         int WINDOW_WIDTH;
         int WINDOW_HEIGHT;
 
-        std::vector<TextField*> guiTextFields;
-        std::vector<TextButton*> guiTextButtons;
-        std::vector<Label*> guiLabels;
-        // TODO add other gui elements in their own vectors
+        std::vector<Container*> guiContainers;
 };

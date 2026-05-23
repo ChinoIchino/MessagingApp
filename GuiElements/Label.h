@@ -15,6 +15,11 @@ class Label{
 
         void render(SDL_Renderer* renderer);
 
+        SDL_Rect getRect() const;
+
+        bool isVisible() const;
+        void setVisibility(bool isVisible);
+
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
         void snapToLeftOf(SDL_Rect rectToSnap, int padding);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
@@ -35,4 +40,6 @@ class Label{
         SDL_Texture* texture;
 
         std::string textContainer;
+
+        bool visible;
 };

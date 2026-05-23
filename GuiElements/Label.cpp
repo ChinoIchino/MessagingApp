@@ -16,6 +16,8 @@ Label::Label(SDL_Rect rect, std::string textContainer, const char* filePathToFon
 
     this->surface = TTF_RenderText_Solid(this->font, this->textContainer.c_str(), this->fontColor);
     this->texture = nullptr;
+
+    this->visible = true;
 }
 
 Label::~Label(){
@@ -28,6 +30,11 @@ Label::~Label(){
 }
 
 void Label::render(SDL_Renderer* renderer){
+    // If the visibility is set to false do not render
+    if(!this->visible){
+        return;
+    }
+
     if(this->surface == nullptr){
         std::cout << "Label::render: this->surface is NULL, Stopping the render" << std::endl;
         return;
@@ -50,6 +57,17 @@ void Label::render(SDL_Renderer* renderer){
         surface->h
     };
     SDL_RenderCopy(renderer, this->texture, NULL, &dst);
+}
+
+SDL_Rect Label::getRect() const{
+    return this->rect;
+}
+
+bool Label::isVisible() const{
+    return this->visible;
+}
+void Label::setVisibility(bool isVisible){
+    this->visible = isVisible;
 }
 
 void Label::snapToLeftOf(SDL_Rect rectToSnap, int padding){

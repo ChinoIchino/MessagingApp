@@ -19,6 +19,9 @@ class TextButton{
 
         SDL_Rect getRect();
 
+        bool isVisible() const;
+        void setIsVisible(bool isVisible);
+
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
         void snapToLeftOf(SDL_Rect rectToSnap, int padding);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
@@ -41,6 +44,8 @@ class TextButton{
         SDL_Texture* texture;
 
         std::string textContainer;
+
+        bool visible;
 
         /** Function that will be called via the isPressed */
         void (*reactFunction)(void* arg);

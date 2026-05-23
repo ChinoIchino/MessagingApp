@@ -15,6 +15,8 @@ TextField::TextField(SDL_Rect rect, SDL_Color bgColor, const char* filePathToFon
 
     this->surface = nullptr;
     this->texture = nullptr;
+
+    this->visible = true;
 }
 
 TextField::~TextField(){
@@ -26,18 +28,77 @@ TextField::~TextField(){
     }
 }
 
-bool TextField::getIsSelected(){
+bool TextField::getIsSelected() const{
     return this->isSelected;
 }
 void TextField::setIsSelected(bool newStatus){
     this->isSelected = newStatus;
 }
 
-SDL_Rect TextField::getRect(){
+bool TextField::isVisible() const{
+    return this->visible;
+}
+void TextField::setIsVisible(bool isVisible){
+    this->visible = isVisible;
+}
+
+std::string TextField::getTextContainer() const{
+    return this->textContainer;
+}
+SDL_Rect TextField::getRect() const{
     return this->rect;
 }
 
+void TextField::snapToLeftOf(SDL_Rect rectToSnap, int padding){
+    int height = this->rect.h;
+    int width = this->rect.w;
+
+    this->rect = {
+        rectToSnap.x - width - padding,
+        rectToSnap.y,
+        width,
+        height
+    };
+}
+void TextField::snapToRightOf(SDL_Rect rectToSnap, int padding){
+    int height = this->rect.h;
+    int width = this->rect.w;
+
+    this->rect = {
+        rectToSnap.x + rectToSnap.w + padding,
+        rectToSnap.y,
+        width,
+        height
+    };
+}
+void TextField::snapToBottomOf(SDL_Rect rectToSnap, int padding){
+    int height = this->rect.h;
+    int width = this->rect.w;
+
+    this->rect = {
+        rectToSnap.x,
+        rectToSnap.y + height + padding,
+        width,
+        height
+    };
+}
+void TextField::snapToTopOf(SDL_Rect rectToSnap, int padding){
+    int height = this->rect.h;
+    int width = this->rect.w;
+
+    this->rect = {
+        rectToSnap.x,
+        rectToSnap.y - height - padding,
+        width,
+        height
+    };
+}
+
 void TextField::render(SDL_Renderer* renderer){
+    if(!this->visible){
+        return;
+    }
+
     // std::cout << "TextField Render got called" << std::endl;
     if(this->surface != nullptr){
         SDL_FreeSurface(this->surface);
@@ -130,6 +191,9 @@ void TextField::clearTextContainer(){
 }
 
 bool TextField::isInside(int x, int y){
-    return (this->rect.x <= x && (this->rect.x + this->rect.w) >= x)
-        && (this->rect.y <= y && (this->rect.y + this->rect.h) >= y);
+    if(this->visible){
+        return (this->rect.x <= x && (this->rect.x + this->rect.w) >= x)
+            && (this->rect.y <= y && (this->rect.y + this->rect.h) >= y);
+    }
+    return false;
 }

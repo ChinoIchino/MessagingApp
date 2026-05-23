@@ -11,10 +11,23 @@ class TextField{
         void removeFromTextContainer();
         void clearTextContainer();
 
-        bool getIsSelected();
+        bool getIsSelected() const;
         void setIsSelected(bool isSelected);
 
-        SDL_Rect getRect();
+        std::string getTextContainer() const;
+        SDL_Rect getRect() const;
+
+        bool isVisible() const;
+        void setIsVisible(bool isVisible);
+
+        /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
+        void snapToLeftOf(SDL_Rect rectToSnap, int padding);
+        /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
+        void snapToRightOf(SDL_Rect rectToSnap, int padding);
+        /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
+        void snapToTopOf(SDL_Rect rectToSnap, int padding);
+        /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
+        void snapToBottomOf(SDL_Rect rectToSnap, int padding);
 
         void render(SDL_Renderer* renderer);
 
@@ -37,6 +50,7 @@ class TextField{
         /** String that represent the text inside the TextField */
         std::string textContainer;
 
+        bool visible;
         /** If the user have selected this */
         bool isSelected;
 };

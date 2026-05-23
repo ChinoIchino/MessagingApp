@@ -19,6 +19,8 @@ TextButton::TextButton(SDL_Rect rect, SDL_Color backgroundColor, std::string tex
 
     this->reactFunction = reactFunction;
     this->arg = arg;
+
+    this->visible = true;
 }
 TextButton::~TextButton(){
     if(this->surface != nullptr){
@@ -30,6 +32,10 @@ TextButton::~TextButton(){
 }
 
 bool TextButton::isPressed(int x, int y){
+    if(!this->visible){
+        return false;
+    }
+    
     if((this->rect.x <= x && (this->rect.x + this->rect.w) >= x)
         && (this->rect.y <= y && (this->rect.y + this->rect.h) >= y)
     ){
@@ -43,6 +49,10 @@ bool TextButton::isPressed(int x, int y){
 }
 
 void TextButton::render(SDL_Renderer* renderer){
+    if(!this->visible){
+        return;
+    }
+
     SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
     SDL_RenderFillRect(renderer, &this->rect);
 
@@ -79,6 +89,13 @@ void TextButton::render(SDL_Renderer* renderer){
 
 SDL_Rect TextButton::getRect(){
     return this->rect;
+}
+
+bool TextButton::isVisible() const{
+    return this->visible;
+}
+void TextButton::setIsVisible(bool isVisible){
+    this->visible = isVisible;
 }
 
 void TextButton::snapToLeftOf(SDL_Rect rectToSnap, int padding){

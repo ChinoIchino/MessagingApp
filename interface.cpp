@@ -5,8 +5,15 @@
 #include <vector>
 #include <iostream>
 
-void func(void* arg){
-    std::cout << "Im the button function!" << std::endl;
+void collectTextFieldInformation(void* arg){
+    // GuiElements* gui = (GuiElements*)(arg);
+    
+    // std::string username = gui->getTextFieldList()[0]->getTextContainer();
+
+    // std::cout 
+    //     << "collectTextFieldInformation: Username: " << gui->getTextFieldList()[0]->getTextContainer() 
+    //     << " // Password: " << gui->getTextFieldList()[1]->getTextContainer() 
+    // << std::endl;
 }
 
 void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui){
@@ -24,38 +31,31 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
                     int mouseX = event.button.x;
                     int mouseY = event.button.y;
 
-                    for(TextField* textField: gui->getTextFieldList()){
-                        if(textField->isInside(mouseX, mouseY)){
-                            std::cout << "TextField is selected" << std::endl;
-                            textField->setIsSelected(true);
-                        }else{
-                            std::cout << "TextField is unselected" << std::endl;
-                            textField->setIsSelected(false);
-                        }
-                    }
-                    for(TextButton* textButton: gui->getTextButtonsList()){
-                        if(textButton->isPressed(mouseX, mouseY)){
-                            //TODO prolly nothing, isPressed already manage that
-                        }
+                    for(Container* container: gui->getContainerList()){
+                        container->handleMouseInput(mouseX, mouseY);
                     }
                     break;
                 }
                 case SDL_TEXTINPUT:{
-                    for(TextField* textField: gui->getTextFieldList()){
-                        if(textField->getIsSelected()){
-                            // std::cout << "TextField Render about to add a char" << std::endl;
-                            std::cout << "TextField about to add the char " << event.text.text << std::endl;
-                            textField->addToTextContainer(event.text.text);
+                    for(Container* container: gui->getContainerList()){
+                        for(TextField* textField: container->getTextFieldList()){
+                            if(textField->getIsSelected()){
+                                // std::cout << "TextField Render about to add a char" << std::endl;
+                                std::cout << "TextField about to add the char " << event.text.text << std::endl;
+                                textField->addToTextContainer(event.text.text);
+                            }
                         }
                     }
                     break;
                 }
                 case SDL_KEYDOWN:{
-                    for(TextField* textField: gui->getTextFieldList()){
-                        if(textField->getIsSelected()){
-                            if(event.key.keysym.sym == SDLK_BACKSPACE){
-                                std::cout << "TextField about to remove a char" << std::endl;
-                                textField->removeFromTextContainer();
+                    for(Container *container: gui->getContainerList()){
+                        for(TextField* textField: container->getTextFieldList()){
+                            if(textField->getIsSelected()){
+                                if(event.key.keysym.sym == SDLK_BACKSPACE){
+                                    std::cout << "TextField about to remove a char" << std::endl;
+                                    textField->removeFromTextContainer();
+                                }
                             }
                         }
                     }
@@ -67,9 +67,6 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
         SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
         SDL_RenderClear(renderer);
         
-        // SDL_Rect rect = {50, 50, 50, 50};
-        // SDL_SetRenderDrawColor(renderer, 0, 120, 255, 255);
-        // SDL_RenderFillRect(renderer, &rect);
         gui->renderAll(renderer);
         
         SDL_RenderPresent(renderer);
@@ -97,29 +94,38 @@ GuiElements* initInterface(const int WINDOW_WIDTH, const int WINDOW_HEIGHT){
     const char* fontPath = "Ressource/Zikketica.ttf";
     SDL_Color bgColor = {0, 0, 0};
     SDL_Color fontColor = {255, 255, 255};
+    SDL_Rect rect = {gui->getCenterX() - 100, gui->getCenterY() - 100, 200, 35};
 
-    // X Position, Y Position, Width, Height
-    SDL_Rect tf1Rect = {gui->getCenterX(), 3 * gui->getCenterY() / 2, 50, 30};
-    TextField* tf1 = new TextField(tf1Rect, bgColor, fontPath, fontColor);
-    gui->addTextField(tf1);
-    
-    SDL_Rect tb1Rect = {gui->getCenterX(), gui->getCenterY(), 200, 30};
-    TextButton* tbutton1 = new TextButton(tb1Rect, bgColor, "Press Me!", fontPath, fontColor, &func, NULL);
-    gui->addTextButton(tbutton1);
+    SDL_Rect c1Rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+    Container* c1 = new Container(c1Rect, {128, 128, 128});
+    c1->setHandleInput(false);
 
-    // On purpose setting the x position to 2000 to try the snapToLeft
-    SDL_Rect lb1Rect = {2000, gui->getCenterY(), 50, 30};
-    Label* label1 = new Label(lb1Rect, "Test Label: ", fontPath, fontColor);
-    gui->addLabel(label1);
-    
-    label1->snapToTopOf(tf1->getRect(), 0);
-    tbutton1->snapToBottomOf(tf1->getRect(), 10);
-    
+    TextField* nameTextField = new TextField(rect, bgColor, fontPath, fontColor);
+    TextField* passTextField = new TextField(rect, bgColor, fontPath, fontColor);
+    c1->addTextField(nameTextField);
+    c1->addTextField(passTextField);
 
-    //Init of the interface
-    // SDL_Rect rect = {250, 150, 300, 200};
-    // SDL_SetRenderDrawColor(renderer, 0, 120, 255, 255);
-    // SDL_RenderFillRect(renderer, &rect);
+    Label* nameLabel = new Label(rect, "Username: ", fontPath, fontColor);
+    Label* passLabel = new Label(rect, "Password: ", fontPath, fontColor);
+    c1->addLabel(nameLabel);
+    c1->addLabel(passLabel);
+
+    TextButton* submitButton = new TextButton(rect, bgColor, "Submit", fontPath, fontColor, &collectTextFieldInformation, (void*)(gui));
+    c1->addTextButton(submitButton);
+
+    nameLabel->snapToLeftOf(nameTextField->getRect(), 10);
+    passTextField->snapToBottomOf(nameTextField->getRect(), 10);
+    passLabel->snapToBottomOf(nameLabel->getRect(), 10);
+    submitButton->snapToBottomOf(passTextField->getRect(), 20);
+
+    // Container
+    SDL_Rect containerRect = {gui->getCenterX(), gui->getCenterY(), 200, 200};
+    SDL_Color containerColor = {128, 0, 255};
+
+    Container* c2 = new Container(containerRect, containerColor);
+
+    gui->addContainer(c1);
+    gui->addContainer(c2);
 
     return gui;
 }
