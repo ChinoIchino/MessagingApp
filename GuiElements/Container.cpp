@@ -1,8 +1,12 @@
 #include "Container.h"
 
-Container::Container(SDL_Rect rect, SDL_Color backgroundColor){
+Container::Container(SDL_Rect rect, SDL_Color backgroundColor, SDL_Color guiElementsBackgroundColor, std::string filePathToFont, SDL_Color fontColor){
     this->rect = rect;
     this->backgroundColor = backgroundColor;
+    this->guiBackgroundColor = guiElementsBackgroundColor;
+
+    this->fontPath = filePathToFont;
+    this->fontColor = fontColor;
 
     this->visible = true;
     this->handleInput = true;
@@ -99,22 +103,49 @@ bool Container::handleKeyInput(SDL_Keycode key, SDL_Renderer* renderer){
 std::vector<TextField*> Container::getTextFieldList() const{
     return this->guiTextFields;
 }
-void Container::addTextField(TextField* textField){
-    this->guiTextFields.push_back(textField);
+TextField* Container::addTextField(int width, int height){
+    TextField* toAdd = new TextField(
+        {0, 0, width, height},
+        this->guiBackgroundColor,
+        this->fontPath.c_str(),
+        fontColor
+    );
+    this->guiTextFields.push_back(toAdd);
+
+    return toAdd;
 }
 
 std::vector<TextButton*> Container::getTextButtonsList() const{
     return this->guiTextButtons;
 }
-void Container::addTextButton(TextButton* textButton){
-    this->guiTextButtons.push_back(textButton);
+TextButton* Container::addTextButton(int width, int height, std::string displayText, void (*reactFunction)(void* arg), void* arg){
+    TextButton* toAdd = new TextButton(
+        {0, 0, width, height},
+        this->guiBackgroundColor,
+        displayText,
+        this->fontPath.c_str(),
+        this->fontColor,
+        reactFunction,
+        arg
+    );
+    this->guiTextButtons.push_back(toAdd);
+
+    return toAdd;
 }
 
 std::vector<Label*> Container::getLabelsList() const{
     return this->guiLabels;
 }
-void Container::addLabel(Label* label){
-    this->guiLabels.push_back(label);
+Label* Container::addLabel(std::string displayedText, int fontSize){
+    Label* toAdd = new Label(
+        {0, 0, 0, fontSize},
+        displayedText,
+        this->fontPath.c_str(),
+        this->fontColor    
+    );
+    this->guiLabels.push_back(toAdd);
+
+    return toAdd;
 }
 
 int Container::getCenterX(){

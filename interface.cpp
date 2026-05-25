@@ -2,12 +2,14 @@
 #include "GuiElements/GuiElements.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <vector>
 #include <iostream>
 
 // TODO make a function that connect to a database of users
-void collectTextFieldInformation(void* arg){
-    // GuiElements* gui = (GuiElements*)(arg);
+void connectToAccount(void* arg){
+    GuiElements* gui = (GuiElements*)(arg);
+    gui->changeRender(GuiElements::GuiGroup::MAINMENU_GUI_GROUP);
     
     // std::string username = gui->getTextFieldList()[0]->getTextContainer();
 
@@ -20,35 +22,34 @@ void collectTextFieldInformation(void* arg){
 void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui){
     // Render the first interface
     SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
-    gui->changeRender(GuiElements::GuiGroup::LOGIN_GUI_GROUP, renderer);
+    gui->changeRender(GuiElements::GuiGroup::LOGIN_GUI_GROUP);
     SDL_RenderPresent(renderer);
     
     SDL_Event event;
     bool running = true;
     while(running){
-        while(SDL_WaitEvent(&event)){
-            switch (event.type){
-                case SDL_QUIT:{
-                    running = false;
-                    break;
-                }
-                case SDL_MOUSEBUTTONDOWN:
-                case SDL_TEXTINPUT:
-                case SDL_KEYDOWN:{
-                    gui->handleEvent(event, renderer);
-                    SDL_RenderPresent(renderer);
-                    break;
-                }
+        SDL_WaitEvent(&event);
+        switch (event.type){
+            case SDL_QUIT:{
+                running = false;
+                break;
+            }
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_TEXTINPUT:
+            case SDL_KEYDOWN:{
+                gui->handleEvent(event);
+                SDL_RenderPresent(renderer);
+                break;
             }
         }
-        
-        // SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
-        // SDL_RenderClear(renderer);
-        
-        // gui->renderAll(renderer);
-        
-        // SDL_RenderPresent(renderer);
     }
+        
+    // SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
+    // SDL_RenderClear(renderer);
+    
+    // gui->renderAll(renderer);
+    
+    // SDL_RenderPresent(renderer);
     
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -60,84 +61,54 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
     SDL_Quit();
 }
 
-GuiElements* initInterface(const int WINDOW_WIDTH, const int WINDOW_HEIGHT){
-    GuiElements* gui = new GuiElements(WINDOW_WIDTH, WINDOW_HEIGHT);
+GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const int WINDOW_HEIGHT){
+    GuiElements* gui = new GuiElements(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     
-    if (TTF_Init() == -1){
+    if(TTF_Init() == -1){
         std::cout << TTF_GetError() << std::endl;
         return NULL;
     }
+    // IMG_Init(IMG_INIT_PNG);
+    // if(IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG){
+    //     std::cout << TTF_GetError() << std::endl;
+    //     return NULL;
+    // }
 
-    // TTF_Font* font = TTF_OpenFont("Ressource/Zikketica.ttf", 14);
-    const char* fontPath = "Ressource/Zikketica.ttf";
-    SDL_Color bgColor = {0, 0, 0};
+    // Shared ressource between containers
+    std::string fontPath = "Ressource/Zikketica.ttf";
+    SDL_Color guiBgColor = {128, 128, 128};
     SDL_Color fontColor = {255, 255, 255};
     SDL_Rect rect = {gui->getCenterX() - 100, gui->getCenterY() - 100, 200, 35};
 
-    // Login Container
-    SDL_Rect container2Rect = {gui->getCenterX() - 150, gui->getCenterY() - 75, 300, 250};
-    SDL_Color container2Color = {51, 255, 153};
-
-    Container* loginContainer = new Container(container2Rect, container2Color);
-
-    TextField* usernameTF = new TextField(
-        {
-            loginContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X),
-            loginContainer->getAbsolutePositionY(Container::AbsolutePositionY::TOP_Y) + 50, 
-            100, 
-            35
-        },
-        bgColor,
+    // Login Container -------------------------------------------------
+    Container* loginContainer = new Container(
+        {gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
+        {0, 153, 76} , // old color: 51, 255, 153
+        guiBgColor,
         fontPath,
         fontColor
     );
     
-    TextField* passTF = new TextField(
-        {0, 0, 100, 35},
-        bgColor,
-        fontPath,
-        fontColor
-    );
-    passTF->snapToBottomOf(usernameTF->getRect(), 50);
+    TextField* usernameTF = loginContainer->addTextField(100, 35);
+    TextField* passTF = loginContainer->addTextField(100, 35);
+    Label* usernameL = loginContainer->addLabel("Username:", 35);
+    Label* passwordL = loginContainer->addLabel("Password:", 35);
+    TextButton* submitButton = loginContainer->addTextButton(100, 30, "Submit", &connectToAccount, gui);
 
-    Label* usernameL = new Label(
-        {0, 0, 0, 35},
-        "Username",
-        fontPath,
-        fontColor
+    usernameTF->moveTo(
+        loginContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X),
+        loginContainer->getAbsolutePositionY(Container::AbsolutePositionY::TOP_Y) + 50
     );
     usernameL->snapToLeftOf(usernameTF->getRect(), 10);
-
-    Label* passL = new Label(
-        {0, 0, 0, 35},
-        "Password",
-        fontPath,
-        fontColor
+    passTF->snapToBottomOf(usernameTF->getRect(), 20);
+    passwordL->snapToLeftOf(passTF->getRect(), 10);
+    submitButton->moveTo(
+        loginContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 50,
+        loginContainer->getAbsolutePositionY(Container::AbsolutePositionY::BOTTOM_Y) - 70
     );
-    passL->snapToLeftOf(passTF->getRect(), 10);
-
-    TextButton* submitTB = new TextButton(
-        {
-            loginContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 50,
-            loginContainer->getAbsolutePositionY(Container::AbsolutePositionY::BOTTOM_Y) - 50, 
-            100, 
-            35
-        },
-        bgColor,
-        "Submit",
-        fontPath,
-        fontColor,
-        NULL,
-        NULL
-    );
-
-    loginContainer->addTextField(usernameTF);
-    loginContainer->addTextField(passTF);
-    loginContainer->addLabel(usernameL);
-    loginContainer->addLabel(passL);
-    loginContainer->addTextButton(submitTB);
 
     gui->addContainer(loginContainer);
+    // gui->addContainer(mainMenuContainer);
 
     return gui;
 }
@@ -178,7 +149,7 @@ void CreateWindow(){
         return;
     }
     
-    GuiElements* gui = initInterface(WINDOW_WIDTH, WINDOW_HEIGHT);
+    GuiElements* gui = initInterface(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     if(!gui){
         std::cout << "initInterface returned NULL" << std::endl;

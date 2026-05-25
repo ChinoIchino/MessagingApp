@@ -4,7 +4,7 @@
 TextField::TextField(SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor){
     this->rect = rect;
     this->backgroundColor = bgColor;
-
+    
     this->font = TTF_OpenFont(filePathToFont, this->rect.h / 2);
 
     if(!this->font){
@@ -49,6 +49,12 @@ SDL_Rect TextField::getRect() const{
     return this->rect;
 }
 
+void TextField::moveTo(int x, int y){
+    int width = this->rect.w;
+    int height = this->rect.h;
+
+    this->rect = {x, y, width, height};
+}
 void TextField::snapToLeftOf(SDL_Rect rectToSnap, int padding){
     int height = this->rect.h;
     int width = this->rect.w;

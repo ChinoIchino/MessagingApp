@@ -12,17 +12,21 @@ class GuiElements{
             MAINMENU_GUI_GROUP
         };
         
-        GuiElements(const int WINDOW_WIDTH, const int WINDOW_HEIGHT);
+        GuiElements(SDL_Renderer* renderer, const int WINDOW_WIDTH, const int WINDOW_HEIGHT);
         ~GuiElements();
 
-        /** Set the input handler and the visibility to true and render the choosen gui group.
-         *  Set every other groups to false. 
+        /** 
+         * Set the input handler and the visibility to true and render the choosen gui group.
+         * Set every other groups to false. 
          */
-        void changeRender(GuiGroup screenToRender, SDL_Renderer* renderer);
-        /** Render all the elements that was added to this object */
-        void renderAll(SDL_Renderer* renderer);
+        void changeRender(GuiGroup screenToRender);
+        /** 
+         * Render all the elements that was added to this object
+         * Ignore every item with this.visible = false 
+         */
+        void renderAll();
 
-        void handleEvent(SDL_Event event, SDL_Renderer* renderer);
+        void handleEvent(SDL_Event event);
 
         /** @return The center of the window based on WINDOW_WIDTH */
         int getCenterX() const{
@@ -47,6 +51,8 @@ class GuiElements{
     private: 
         int WINDOW_WIDTH;
         int WINDOW_HEIGHT;
+
+        SDL_Renderer* renderer;
 
         GuiGroup currentDisplayedGroup;
 

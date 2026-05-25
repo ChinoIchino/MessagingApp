@@ -84,7 +84,14 @@ void TextButton::render(SDL_Renderer* renderer){
         surface->w,
         surface->h
     };
+
+    // SDL_Texture* imageTexture = IMG_LoadTexture(renderer, "Ressource/Img/buttonTextureV2.png");
+    // if(imageTexture == NULL){
+    //     std::cout << "Error loading image" << std::endl;
+    // }
+
     SDL_RenderCopy(renderer, this->texture, NULL, &dst);
+    // SDL_RenderCopy(renderer, imageTexture, NULL, &this->rect);
 }
 
 SDL_Rect TextButton::getRect(){
@@ -98,6 +105,12 @@ void TextButton::setIsVisible(bool isVisible){
     this->visible = isVisible;
 }
 
+void TextButton::moveTo(int x, int y){
+    int width = this->rect.w;
+    int height = this->rect.h;
+
+    this->rect = {x, y, width, height};
+}
 void TextButton::snapToLeftOf(SDL_Rect rectToSnap, int padding){
     int height = this->rect.h;
     int width = this->rect.w;

@@ -70,6 +70,19 @@ void Label::setVisibility(bool isVisible){
     this->visible = isVisible;
 }
 
+void Label::moveTo(int x, int y){
+    int height = this->rect.h;
+    
+    int widthOfText = 0;
+    TTF_SizeText(
+            this->font,
+            this->textContainer.c_str(),
+            &widthOfText,
+            NULL
+        );
+    
+    this->rect = {x, y, widthOfText, height};
+}
 void Label::snapToLeftOf(SDL_Rect rectToSnap, int padding){
     // std::cout << "Old label Rect: " << this->rect.x << " " << this->rect.y << " // " << this->rect.w << " " << this->rect.h << std::endl;
     int height = this->rect.h;

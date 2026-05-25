@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+
 #include <string>
 
 class TextButton{
@@ -22,6 +24,8 @@ class TextButton{
         bool isVisible() const;
         void setIsVisible(bool isVisible);
 
+        /** Move to a absolute position based on the attributs */
+        void moveTo(int x, int y);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
         void snapToLeftOf(SDL_Rect rectToSnap, int padding);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */

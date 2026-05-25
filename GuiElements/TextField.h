@@ -26,6 +26,8 @@ class TextField{
         bool isVisible() const;
         void setIsVisible(bool isVisible);
 
+        /** Move to a absolute position based on the attributs */
+        void moveTo(int x, int y);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
         void snapToLeftOf(SDL_Rect rectToSnap, int padding);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
