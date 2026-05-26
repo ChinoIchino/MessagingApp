@@ -30,6 +30,9 @@ class Container{
         );
         ~Container();
 
+        void loadOutline(SDL_Texture* leftSideOutline, SDL_Texture* rightSideOutline, SDL_Texture* middleOutline);
+        void loadAllTextures(SDL_Renderer* renderer);
+
         void render(SDL_Renderer* renderer);
 
         std::vector<TextField*> getTextFieldList() const;
@@ -79,6 +82,10 @@ class Container{
         SDL_Rect rect;
         SDL_Color backgroundColor;
         SDL_Color guiBackgroundColor;
+
+        SDL_Texture* leftSideOutline;
+        SDL_Texture* rightSideOutline;
+        SDL_Texture* middleOutline;
         
         std::string fontPath;
         SDL_Color fontColor;

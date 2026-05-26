@@ -31,6 +31,21 @@ TextButton::~TextButton(){
     }
 }
 
+void TextButton::loadTexture(SDL_Renderer* renderer){
+    this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
+    this->textRect = {
+        this->rect.x + (this->rect.w - this->surface->w) / 2,
+        this->rect.y + surface->h / 2,
+        surface->w,
+        surface->h
+    };
+
+    // Give them a position and size (7 because the textures are 7 pixels wide)
+    this->leftTexRect = {this->rect.x, this->rect.y, 7, this->rect.h};
+    this->rightTexRect = {this->rect.x + this->rect.w - 7 , this->rect.y, 7, this->rect.h};
+    this->middleTexRect = {this->rect.x + 7, this->rect.y, this->rect.w - 14, this->rect.h};
+}
+
 bool TextButton::isPressed(int x, int y){
     if(!this->visible){
         return false;
@@ -56,42 +71,25 @@ void TextButton::render(SDL_Renderer* renderer){
     SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
     SDL_RenderFillRect(renderer, &this->rect);
 
-    if(this->textContainer.empty()){
-        return;
-    }
-
     // If the surface is null, stopping the render before it crashes
-    if(this->surface == nullptr){
-        std::cout << "TextButton::render: this->surface is NULL, Stopping the render" << std::endl;
-        return;
-    }
-    // Delete the texture from the last frame
-    if(this->texture != nullptr){
-        SDL_DestroyTexture(this->texture);
-        this->texture = nullptr;
-    }
-    // Create a new texture for the current frame
-    this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
-
-    if(this->texture == nullptr){
+    if(this->texture == NULL){
         std::cout << "TextButton::render: this->texture is NULL, Stopping the render" << std::endl;
         return;
     }
-
-    SDL_Rect dst = {
-        this->rect.x + (this->rect.w - this->surface->w) / 2,
-        this->rect.y + surface->h / 2,
-        surface->w,
-        surface->h
-    };
-
-    // SDL_Texture* imageTexture = IMG_LoadTexture(renderer, "Ressource/Img/buttonTextureV2.png");
-    // if(imageTexture == NULL){
-    //     std::cout << "Error loading image" << std::endl;
-    // }
-
-    SDL_RenderCopy(renderer, this->texture, NULL, &dst);
-    // SDL_RenderCopy(renderer, imageTexture, NULL, &this->rect);
+    
+    SDL_RenderCopy(renderer, this->texture, NULL, &this->textRect);
+}
+void TextButton::renderOutline(SDL_Renderer* renderer, SDL_Texture* texLeftSide, SDL_Texture* texRigthSide, SDL_Texture* texMiddleSide){
+    // Load all the textures used. 3 textures are used to avoid strange stretches of textures
+    if(texLeftSide == NULL || texRigthSide == NULL || texMiddleSide == NULL){
+        std::cout << "Error TextButton::render : One or more textures didn't loaded, stopping the render" << std::endl;
+        return;
+    }
+    
+    // Render the 3 textures on top of the TextButton rectangle
+    SDL_RenderCopy(renderer, texMiddleSide, NULL, &this->middleTexRect);
+    SDL_RenderCopy(renderer, texLeftSide, NULL, &this->leftTexRect);
+    SDL_RenderCopy(renderer, texRigthSide, NULL, &this->rightTexRect);
 }
 
 SDL_Rect TextButton::getRect(){

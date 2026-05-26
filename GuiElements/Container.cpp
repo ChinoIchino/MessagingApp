@@ -29,6 +29,20 @@ Container::~Container(){
     this->guiLabels.clear();
 }
 
+void Container::loadOutline(SDL_Texture* leftSideOutline, SDL_Texture* rightSideOutline, SDL_Texture* middleOutline){
+    this->leftSideOutline = leftSideOutline;
+    this->rightSideOutline = rightSideOutline;
+    this->middleOutline = middleOutline;
+}
+void Container::loadAllTextures(SDL_Renderer* renderer){
+    for(TextField* textField: this->guiTextFields){
+        textField->loadTextures();
+    }
+    for(TextButton* textButton: this->guiTextButtons){
+        textButton->loadTexture(renderer);
+    }
+}
+
 void Container::render(SDL_Renderer* renderer){
     if(!this->visible){
         return;
@@ -39,9 +53,11 @@ void Container::render(SDL_Renderer* renderer){
     
     for(TextField* textField: this->guiTextFields){
         textField->render(renderer);
+        textField->renderOutline(renderer, this->leftSideOutline, this->rightSideOutline, this->middleOutline);
     }
     for(TextButton* textButton: this->guiTextButtons){
         textButton->render(renderer);
+        textButton->renderOutline(renderer, this->leftSideOutline, this->rightSideOutline, this->middleOutline);
     }
     for(Label* label: this->guiLabels){
         label->render(renderer);
@@ -59,7 +75,6 @@ bool Container::handleMouseInput(int x, int y){
     if(!this->handleInput){
         return false;
     }
-
     bool result = false;
     for(TextField* textField: this->guiTextFields){
         if(textField->isInside(x, y)){

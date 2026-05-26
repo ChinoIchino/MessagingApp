@@ -34,22 +34,20 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
                 running = false;
                 break;
             }
+            case SDL_MOUSEMOTION:{
+                break;
+            }
             case SDL_MOUSEBUTTONDOWN:
             case SDL_TEXTINPUT:
             case SDL_KEYDOWN:{
+                SDL_RenderClear(renderer);
                 gui->handleEvent(event);
+                gui->renderAll();
                 SDL_RenderPresent(renderer);
                 break;
             }
         }
     }
-        
-    // SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
-    // SDL_RenderClear(renderer);
-    
-    // gui->renderAll(renderer);
-    
-    // SDL_RenderPresent(renderer);
     
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -68,7 +66,7 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
         std::cout << TTF_GetError() << std::endl;
         return NULL;
     }
-    // IMG_Init(IMG_INIT_PNG);
+    IMG_Init(IMG_INIT_PNG);
     // if(IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG){
     //     std::cout << TTF_GetError() << std::endl;
     //     return NULL;

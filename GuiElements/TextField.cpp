@@ -28,6 +28,13 @@ TextField::~TextField(){
     }
 }
 
+void TextField::loadTextures(){
+    // Give them a position and size (7 because the textures are 7 pixels wide)
+    this->leftTexRect = {this->rect.x, this->rect.y, 7, this->rect.h};
+    this->rightTexRect = {this->rect.x + this->rect.w - 7 , this->rect.y, 7, this->rect.h};
+    this->middleTexRect = {this->rect.x + 7, this->rect.y, this->rect.w - 14, this->rect.h};
+}
+
 bool TextField::isSelected() const{
     return this->selected;
 }
@@ -167,6 +174,18 @@ void TextField::render(SDL_Renderer* renderer){
         surface->h
     };
     SDL_RenderCopy(renderer, this->texture, NULL, &dst);
+}
+void TextField::renderOutline(SDL_Renderer* renderer, SDL_Texture* texLeftSide, SDL_Texture* texRigthSide, SDL_Texture* texMiddleSide){
+    // Load all the textures used. 3 textures are used to avoid strange stretches of textures
+    if(texLeftSide == NULL || texRigthSide == NULL || texMiddleSide == NULL){
+        std::cout << "Error TextButton::render : One or more textures didn't loaded, stopping the render" << std::endl;
+        return;
+    }
+    
+    // Render the 3 textures on top of the TextButton rectangle
+    SDL_RenderCopy(renderer, texMiddleSide, NULL, &this->middleTexRect);
+    SDL_RenderCopy(renderer, texLeftSide, NULL, &this->leftTexRect);
+    SDL_RenderCopy(renderer, texRigthSide, NULL, &rightTexRect);
 }
 
 /**

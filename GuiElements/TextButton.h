@@ -17,7 +17,11 @@ class TextButton{
         );
         ~TextButton();
 
+        void loadTexture(SDL_Renderer* renderer);
+
         void render(SDL_Renderer* renderer);
+        /** Used to render related textures. Separated from the render function, because there is no reason to re-render it later*/
+        void renderOutline(SDL_Renderer* renderer, SDL_Texture* leftSideOutline, SDL_Texture* rightSideOutline, SDL_Texture* middleOutline);
 
         SDL_Rect getRect();
 
@@ -48,6 +52,11 @@ class TextButton{
         SDL_Texture* texture;
 
         std::string textContainer;
+        SDL_Rect textRect;
+
+        SDL_Rect leftTexRect;
+        SDL_Rect rightTexRect;
+        SDL_Rect middleTexRect;
 
         bool visible;
 

@@ -52,6 +52,10 @@ class GuiElements{
         int WINDOW_WIDTH;
         int WINDOW_HEIGHT;
 
+        SDL_Texture* leftSideOutline;
+        SDL_Texture* rightSideOutline;
+        SDL_Texture* middleOutline;
+
         SDL_Renderer* renderer;
 
         GuiGroup currentDisplayedGroup;

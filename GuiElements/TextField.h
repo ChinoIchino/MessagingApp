@@ -1,11 +1,16 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <string>
 
 class TextField{
     public:
         TextField(SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor);
         ~TextField();
+
+        void loadTextures();
+
+        void renderOutline(SDL_Renderer* renderer, SDL_Texture* texLeftSide, SDL_Texture* texRigthSide, SDL_Texture* texMiddleSide);
 
         /**
          * @param toAdd string of text that will be added to the current textContainer
@@ -38,6 +43,8 @@ class TextField{
         void snapToBottomOf(SDL_Rect rectToSnap, int padding);
 
         void render(SDL_Renderer* renderer);
+        /** Used to render related textures. Separated from the render function, because there is no reason to re-render it later*/
+        void renderTexture(SDL_Renderer* renderer);
 
         bool isInside(int x, int y);
 
@@ -57,6 +64,10 @@ class TextField{
 
         /** String that represent the text inside the TextField */
         std::string textContainer;
+
+        SDL_Rect leftTexRect;
+        SDL_Rect rightTexRect;
+        SDL_Rect middleTexRect;
 
         bool visible;
         /** If the user have selected this */

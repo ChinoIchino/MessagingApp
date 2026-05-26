@@ -6,6 +6,10 @@ GuiElements::GuiElements(SDL_Renderer* renderer, const int WINDOW_WIDTH, const i
 
     this->WINDOW_HEIGHT = WINDOW_HEIGHT;
     this->WINDOW_WIDTH = WINDOW_WIDTH;
+
+    this->leftSideOutline = IMG_LoadTexture(renderer, "Ressource/Img/BorderLeft.png");
+    this->rightSideOutline = IMG_LoadTexture(renderer, "Ressource/Img/BorderRight.png");
+    this->middleOutline = IMG_LoadTexture(renderer, "Ressource/Img/BorderMiddle.png");
 }
 /** 
  * Delete all the containers (and elements inside those containers too)
@@ -54,7 +58,11 @@ void GuiElements::handleEvent(SDL_Event event){
             this->guiContainers[this->currentDisplayedGroup]->handleKeyInput(event.key.keysym.sym, this->renderer);
             break;
         }
-    
+        case SDL_MOUSEMOTION:{
+            // std::cout << "Got the coords: " << event.button.x << " / " << event.button.y << std::endl;
+            // this->guiContainers[this->currentDisplayedGroup]->handleMouseMotion()
+            break;
+        }
     default:
         break;
     };
@@ -64,6 +72,8 @@ std::vector<Container*> GuiElements::getContainerList() const{
     return this->guiContainers;
 }
 void GuiElements::addContainer(Container* container){
+    container->loadOutline(this->leftSideOutline, this->rightSideOutline, this->middleOutline);
+    container->loadAllTextures(this->renderer);
     this->guiContainers.push_back(container);
 }
 
