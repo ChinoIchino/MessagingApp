@@ -27,6 +27,7 @@ class TextButton{
 
         bool isVisible() const;
         void setIsVisible(bool isVisible);
+        void setIsHovering(bool isHovering);
 
         /** Move to a absolute position based on the attributs */
         void moveTo(int x, int y);
@@ -39,11 +40,13 @@ class TextButton{
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
         void snapToBottomOf(SDL_Rect rectToSnap, int padding);
 
+        bool isInside(int x, int y);
         /** Automatically activate the function in the reactFunction attribut */
         bool isPressed(int x, int y);
     private:
         SDL_Rect rect;
         SDL_Color backgroundColor;
+        SDL_Color selectedBackgroundColor;
 
         TTF_Font* font;
         SDL_Color fontColor;
@@ -58,6 +61,7 @@ class TextButton{
         SDL_Rect rightTexRect;
         SDL_Rect middleTexRect;
 
+        bool hovering;
         bool visible;
 
         /** Function that will be called via the isPressed */

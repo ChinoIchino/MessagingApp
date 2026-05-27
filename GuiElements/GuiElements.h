@@ -49,6 +49,9 @@ class GuiElements{
 
 
     private: 
+        SDL_Rect rect;
+        SDL_Color backgroundColor;
+
         int WINDOW_WIDTH;
         int WINDOW_HEIGHT;
 

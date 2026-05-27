@@ -21,7 +21,7 @@ void connectToAccount(void* arg){
 
 void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui){
     // Render the first interface
-    SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
+    // SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
     gui->changeRender(GuiElements::GuiGroup::LOGIN_GUI_GROUP);
     SDL_RenderPresent(renderer);
     
@@ -34,16 +34,16 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
                 running = false;
                 break;
             }
-            case SDL_MOUSEMOTION:{
-                break;
-            }
+            case SDL_MOUSEMOTION:
             case SDL_MOUSEBUTTONDOWN:
             case SDL_TEXTINPUT:
             case SDL_KEYDOWN:{
-                SDL_RenderClear(renderer);
                 gui->handleEvent(event);
+
+                SDL_RenderClear(renderer);
                 gui->renderAll();
                 SDL_RenderPresent(renderer);
+                
                 break;
             }
         }

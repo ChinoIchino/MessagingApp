@@ -1,4 +1,5 @@
 #include "Container.h"
+#include <iostream>
 
 Container::Container(SDL_Rect rect, SDL_Color backgroundColor, SDL_Color guiElementsBackgroundColor, std::string filePathToFont, SDL_Color fontColor){
     this->rect = rect;
@@ -47,7 +48,6 @@ void Container::render(SDL_Renderer* renderer){
     if(!this->visible){
         return;
     }
-    
     SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
     SDL_RenderFillRect(renderer, &this->rect);
     
@@ -87,6 +87,19 @@ bool Container::handleMouseInput(int x, int y){
     for(TextButton* textButton: this->guiTextButtons){
         if(textButton->isPressed(x,y)){
             result = true;
+        }
+    }
+    return result;
+}
+bool Container::handleMouseMotion(int x, int y){
+    bool result = false;
+
+    for(TextButton* textButton: this->guiTextButtons){
+        if(textButton->isInside(x, y)){
+            textButton->setIsHovering(true);
+            result = true;
+        }else{
+            textButton->setIsHovering(false);
         }
     }
     return result;

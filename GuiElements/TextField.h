@@ -43,7 +43,6 @@ class TextField{
         void snapToBottomOf(SDL_Rect rectToSnap, int padding);
 
         void render(SDL_Renderer* renderer);
-        /** Used to render related textures. Separated from the render function, because there is no reason to re-render it later*/
         void renderTexture(SDL_Renderer* renderer);
 
         bool isInside(int x, int y);

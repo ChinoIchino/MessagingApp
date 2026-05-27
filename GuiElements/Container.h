@@ -68,6 +68,7 @@ class Container{
         bool handleMouseInput(int x, int y);
         bool handleTextInput(std::string input, SDL_Renderer* renderer);
         bool handleKeyInput(SDL_Keycode key, SDL_Renderer* renderer);
+        bool handleMouseMotion(int x, int y);
 
         bool isVisible() const;
         void setIsVisible(bool isVisible);

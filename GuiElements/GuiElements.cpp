@@ -2,6 +2,9 @@
 #include <iostream>
 
 GuiElements::GuiElements(SDL_Renderer* renderer, const int WINDOW_WIDTH, const int WINDOW_HEIGHT){
+    this->rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+    this->backgroundColor = {128, 128, 128};
+
     this->renderer = renderer;
 
     this->WINDOW_HEIGHT = WINDOW_HEIGHT;
@@ -23,7 +26,7 @@ GuiElements::~GuiElements(){
 }
 
 void GuiElements::changeRender(GuiGroup indexToRender){
-    if(this->renderer == nullptr){
+    if(!this->renderer){
         return;
     }
 
@@ -59,13 +62,13 @@ void GuiElements::handleEvent(SDL_Event event){
             break;
         }
         case SDL_MOUSEMOTION:{
-            // std::cout << "Got the coords: " << event.button.x << " / " << event.button.y << std::endl;
-            // this->guiContainers[this->currentDisplayedGroup]->handleMouseMotion()
+            this->guiContainers[this->currentDisplayedGroup]->handleMouseMotion(event.button.x, event.button.y);
             break;
         }
-    default:
-        break;
-    };
+        default:
+            std::cout << "GuiElements::handleEvent, this event type is not handled"  << std::endl;
+            break;
+        };
 }
 
 std::vector<Container*> GuiElements::getContainerList() const{
@@ -79,6 +82,9 @@ void GuiElements::addContainer(Container* container){
 
 
 void GuiElements::renderAll(){
+    SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
+    SDL_RenderFillRect(renderer, &this->rect);
+    
     for(Container* container: this->guiContainers){
         container->render(this->renderer);
     }

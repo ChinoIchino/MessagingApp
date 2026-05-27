@@ -5,6 +5,20 @@ TextButton::TextButton(SDL_Rect rect, SDL_Color backgroundColor, std::string tex
     this->rect = rect;
     this->backgroundColor = backgroundColor;
     
+    int tempRed = this->backgroundColor.r + 50;
+    int tempGreen = this->backgroundColor.g + 50;
+    int tempBlue = this->backgroundColor.b + 50;
+    if(tempRed > 255){
+        tempRed = 255;
+    }
+    if(tempGreen > 255){
+        tempGreen = 255;
+    }
+    if(tempBlue > 255){
+        tempBlue = 255;
+    }
+    this->selectedBackgroundColor = {(Uint8)(tempRed), (Uint8)(tempGreen), (Uint8)(tempBlue), this->backgroundColor.a};
+    
     this->font = TTF_OpenFont(filePathToFont, this->rect.h / 2);
 
     if(!this->font){
@@ -20,6 +34,7 @@ TextButton::TextButton(SDL_Rect rect, SDL_Color backgroundColor, std::string tex
     this->reactFunction = reactFunction;
     this->arg = arg;
 
+    this->hovering = false;
     this->visible = true;
 }
 TextButton::~TextButton(){
@@ -46,6 +61,17 @@ void TextButton::loadTexture(SDL_Renderer* renderer){
     this->middleTexRect = {this->rect.x + 7, this->rect.y, this->rect.w - 14, this->rect.h};
 }
 
+bool TextButton::isInside(int x, int y){
+    if(!this->visible){
+        return false;
+    }
+
+    if((this->rect.x <= x && (this->rect.x + this->rect.w) >= x)
+        && (this->rect.y <= y && (this->rect.y + this->rect.h) >= y)){
+        return true;
+    }
+    return false;
+}
 bool TextButton::isPressed(int x, int y){
     if(!this->visible){
         return false;
@@ -54,7 +80,7 @@ bool TextButton::isPressed(int x, int y){
     if((this->rect.x <= x && (this->rect.x + this->rect.w) >= x)
         && (this->rect.y <= y && (this->rect.y + this->rect.h) >= y)
     ){
-        std::cout << "Button got pressed" << std::endl;
+        // std::cout << "Button got pressed" << std::endl;
         if(this->reactFunction != NULL){
             this->reactFunction(this->arg);
         }
@@ -68,8 +94,13 @@ void TextButton::render(SDL_Renderer* renderer){
         return;
     }
 
-    SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
-    SDL_RenderFillRect(renderer, &this->rect);
+    if(this->hovering){
+        SDL_SetRenderDrawColor(renderer, this->selectedBackgroundColor.r, this->selectedBackgroundColor.g, this->selectedBackgroundColor.b, this->selectedBackgroundColor.a);
+        SDL_RenderFillRect(renderer, &this->rect);
+    }else{
+        SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
+        SDL_RenderFillRect(renderer, &this->rect);
+    }
 
     // If the surface is null, stopping the render before it crashes
     if(this->texture == NULL){
@@ -101,6 +132,9 @@ bool TextButton::isVisible() const{
 }
 void TextButton::setIsVisible(bool isVisible){
     this->visible = isVisible;
+}
+void TextButton::setIsHovering(bool isHovering){
+    this->hovering = isHovering;
 }
 
 void TextButton::moveTo(int x, int y){
