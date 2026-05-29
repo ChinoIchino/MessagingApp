@@ -9,7 +9,9 @@ class GuiElements{
     public:
         enum GuiGroup{
             LOGIN_GUI_GROUP,
-            MAINMENU_GUI_GROUP
+            MAINMENU_GUI_GROUP,
+            CREATEMENU_GUI_GROUP,
+            JOINMENU_GUI_GROUP,
         };
         
         GuiElements(SDL_Renderer* renderer, const int WINDOW_WIDTH, const int WINDOW_HEIGHT);
@@ -27,6 +29,8 @@ class GuiElements{
         void renderAll();
 
         void handleEvent(SDL_Event event);
+
+        int getCurrentDisplayedGroup() const;
 
         /** @return The center of the window based on WINDOW_WIDTH */
         int getCenterX() const{

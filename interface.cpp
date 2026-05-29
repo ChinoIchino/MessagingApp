@@ -1,5 +1,9 @@
 #define SDL_MAIN_HANDLED
+
 #include "GuiElements/GuiElements.h"
+
+#include "Server/ServerHandler.h"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
@@ -17,6 +21,26 @@ void connectToAccount(void* arg){
     //     << "collectTextFieldInformation: Username: " << gui->getTextFieldList()[0]->getTextContainer() 
     //     << " // Password: " << gui->getTextFieldList()[1]->getTextContainer() 
     // << std::endl;
+}
+
+void sendToMainMenu(void* arg){
+    GuiElements* gui = (GuiElements*)(arg);
+    gui->changeRender(GuiElements::GuiGroup::MAINMENU_GUI_GROUP);
+}
+
+void sendToLoginMenu(void* arg){
+    GuiElements* gui = (GuiElements*)(arg);
+    gui->changeRender(GuiElements::GuiGroup::LOGIN_GUI_GROUP);
+}
+void sendToCreateServerMenu(void* arg){
+    GuiElements* gui = (GuiElements*)(arg);
+    gui->changeRender(GuiElements::GuiGroup::CREATEMENU_GUI_GROUP);
+}
+void createServer(void* arg){
+    GuiElements* gui = (GuiElements*)(arg);
+    std::string passwordToServer = gui->getContainerList()[gui->getCurrentDisplayedGroup()]->getTextFieldList()[0]->getTextContainer();
+
+    std::cout << "Password to server: " << passwordToServer << std::endl;
 }
 
 void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui){
@@ -66,11 +90,10 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
         std::cout << TTF_GetError() << std::endl;
         return NULL;
     }
-    IMG_Init(IMG_INIT_PNG);
-    // if(IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG){
-    //     std::cout << TTF_GetError() << std::endl;
-    //     return NULL;
-    // }
+    if(IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG){
+        std::cout << TTF_GetError() << std::endl;
+        return NULL;
+    }
 
     // Shared ressource between containers
     std::string fontPath = "Ressource/Zikketica.ttf";
@@ -81,7 +104,8 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
     // Login Container -------------------------------------------------
     Container* loginContainer = new Container(
         {gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
-        {0, 153, 76} , // old color: 51, 255, 153
+        true,
+        {0, 153, 76, 255} , // old color: 51, 255, 153
         guiBgColor,
         fontPath,
         fontColor
@@ -91,7 +115,7 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
     TextField* passTF = loginContainer->addTextField(100, 35);
     Label* usernameL = loginContainer->addLabel("Username:", 35);
     Label* passwordL = loginContainer->addLabel("Password:", 35);
-    TextButton* submitButton = loginContainer->addTextButton(100, 30, "Submit", &connectToAccount, gui);
+    TextButton* submitButton = loginContainer->addTextButton(100, 30, "Submit", &sendToMainMenu, gui);
 
     usernameTF->moveTo(
         loginContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X),
@@ -105,13 +129,63 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
         loginContainer->getAbsolutePositionY(Container::AbsolutePositionY::BOTTOM_Y) - 70
     );
 
+    // Main Menu Container -------------------------------------------------
+    Container* mainMenuContainer = new Container(
+        {gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
+        true,
+        {0, 153, 76, 255} , // old color: 51, 255, 153
+        guiBgColor,
+        fontPath,
+        fontColor
+    );
+
+    TextButton* createGroupTB = mainMenuContainer->addTextButton(120, 35, "Create Group", &sendToCreateServerMenu, gui);
+    TextButton* joinGroupTB = mainMenuContainer->addTextButton(120, 35, "Join Group", NULL, NULL);
+    TextButton* logoutTB = mainMenuContainer->addTextButton(120, 35, "Logout", &sendToLoginMenu, gui);
+
+    createGroupTB->moveTo(
+        mainMenuContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 60,
+        mainMenuContainer->getAbsolutePositionY(Container::AbsolutePositionY::TOP_Y) + 50
+    );
+    joinGroupTB->snapToBottomOf(createGroupTB->getRect(), 25);
+    logoutTB->snapToBottomOf(joinGroupTB->getRect(), 25);
+
+    // Create Menu Container -------------------------------------------------
+    Container* createServerMenuContainer = new Container(
+        {gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
+        true,
+        {0, 153, 76, 255} , // old color: 51, 255, 153
+        guiBgColor,
+        fontPath,
+        fontColor
+    );
+
+    TextField* serverPasswordTF = createServerMenuContainer->addTextField(120, 35);
+    Label* serverPasswordL = createServerMenuContainer->addLabel("Password: ", 35);
+    TextButton* createServerTB = createServerMenuContainer->addTextButton(100, 35, "Create", &createServer, gui);
+    TextButton* goBackServerTB = createServerMenuContainer->addTextButton(100, 35, "Go Back", &sendToMainMenu, gui);
+
+    serverPasswordTF->moveTo(
+        createServerMenuContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 10,
+        createServerMenuContainer->getAbsolutePositionY(Container::AbsolutePositionY::TOP_Y) + 70
+    );
+    serverPasswordL->snapToLeftOf(serverPasswordTF->getRect(), 10);
+
+    createServerTB->moveTo(
+        createServerMenuContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 50,
+        createServerMenuContainer->getAbsolutePositionY(Container::AbsolutePositionY::BOTTOM_Y) - 100
+    );
+    goBackServerTB->snapToBottomOf(createServerTB->getRect(), 5);
+
+
     gui->addContainer(loginContainer);
-    // gui->addContainer(mainMenuContainer);
+    gui->addContainer(mainMenuContainer);
+    gui->addContainer(createServerMenuContainer);
 
     return gui;
 }
 
-void CreateWindow(){
+void createWindow(){
     std::cout << "Main Called!" << std::endl;
     
     const int WINDOW_HEIGHT = 800;
@@ -161,6 +235,22 @@ void CreateWindow(){
 
 
 int main(int argc, char* argv[]){
-    CreateWindow();
+    try{
+        asio::io_context io;
+
+        ServerHandler server(io, 12345);
+
+        io.run();
+    }
+    catch (std::exception& e){
+        std::cout << e.what() << std::endl;
+    }
+
+    // Packet* test = new Packet(Packet::PacketType::MESSAGE, "Random information in the packet");
+    // test->printPacket();
+
+
+
+    // createWindow();
     return 0;
 }

@@ -71,6 +71,10 @@ void GuiElements::handleEvent(SDL_Event event){
         };
 }
 
+int GuiElements::getCurrentDisplayedGroup() const{
+    return this->currentDisplayedGroup;
+}
+
 std::vector<Container*> GuiElements::getContainerList() const{
     return this->guiContainers;
 }

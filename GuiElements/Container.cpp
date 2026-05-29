@@ -1,8 +1,10 @@
 #include "Container.h"
 #include <iostream>
 
-Container::Container(SDL_Rect rect, SDL_Color backgroundColor, SDL_Color guiElementsBackgroundColor, std::string filePathToFont, SDL_Color fontColor){
+Container::Container(SDL_Rect rect, bool isRounded, SDL_Color backgroundColor, SDL_Color guiElementsBackgroundColor, std::string filePathToFont, SDL_Color fontColor){
     this->rect = rect;
+    this->rounded = isRounded;
+
     this->backgroundColor = backgroundColor;
     this->guiBackgroundColor = guiElementsBackgroundColor;
 
@@ -48,8 +50,18 @@ void Container::render(SDL_Renderer* renderer){
     if(!this->visible){
         return;
     }
-    SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
-    SDL_RenderFillRect(renderer, &this->rect);
+    if(this->rounded){
+        roundedBoxRGBA(
+            renderer,
+            this->rect.x, this->rect.y,
+            this->rect.x + this->rect.w, this->rect.y + this->rect.h,
+            8,
+            this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a
+        );
+    }else{
+        SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
+        SDL_RenderFillRect(renderer, &this->rect);
+    }
     
     for(TextField* textField: this->guiTextFields){
         textField->render(renderer);

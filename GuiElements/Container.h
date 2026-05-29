@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,7 @@ class Container{
 
         Container(
             SDL_Rect rect,
+            bool isRounded,
             SDL_Color backgroundColor,
             SDL_Color guiElementsBackgroundColor,
             std::string filePathToFont,
@@ -95,6 +97,7 @@ class Container{
         std::vector<TextButton*> guiTextButtons;
         std::vector<Label*> guiLabels;
 
+        bool rounded;
         bool visible;
         bool handleInput;
 };
