@@ -5,7 +5,9 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/msys64/ucrt64/bin",
-                "C:/msys64/ucrt64/include"
+                "C:/msys64/ucrt64/include",
+                "C:/Users/blasz/Desktop/projetC/setup/ucrt64/bin",
+                "C:/Users/blasz/Desktop/projetC/setup/ucrt64/include"
             ],
             "defines": [
                 "_DEBUG",

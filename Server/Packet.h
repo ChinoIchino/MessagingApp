@@ -1,99 +1,140 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <iostream>
 #include <vector>
 
+
+/**
+ * Encoding of packets:
+ *      Login packet: [uint8_t type][uint8_t sizeOfUsername][std::string usernameInformation][uint8_t sizeOfPassword][std::string passwordInformation]
+ *      Message packet: [uint_8 type][uint16_t sizeOfInformation][std::string stringInformation]
+ */
 class Packet{
     public:
         enum PacketType{
                 LOGIN,
-                MESSAGE,
-                LOGOUT
+                MESSAGE
         };
 
-        Packet(PacketType type, std::string information){
+        Packet(PacketType type, std::string* information){
             this->type = type;
             this->handlePacketEncoding(information);
         };
 
-        void handlePacketEncoding(std::string information){
-            switch(this->type){
-            case PacketType::LOGIN:{
-                //TODO encoding in login packet
-                break;
-            }
-            case PacketType::MESSAGE:{
-                // Write the id of the packet, the size of the message, and the message
-                writeInPacket<std::uint8_t>(2);
-                writeInPacket<std::uint16_t>(information.size());
-                writeInPacket<std::string>(information);
-                break;
-            }
-            case PacketType::LOGOUT:{
-                
-                break;
-            }
-            default:
-                break;
-            }
+        unsigned char* getContainer(){
+            return this->container.data();
         }
-        void handlePacketDecoding(){
+        int getSizeOfContainer() const{
+            return this->container.size();
+        }
+
+        void handlePacketEncoding(std::string* information){
             switch(this->type){
-            case PacketType::LOGIN:{
-                //TODO encoding in login packet
-                break;
-            }
-            case PacketType::MESSAGE:{
-                // Write the id of the packet, the size of the message, and the message
-                read()
-                break;
-            }
-            case PacketType::LOGOUT:{
-                
-                break;
-            }
-            default:
-                break;
+                case PacketType::LOGIN:{
+                    if(information->size() < 2){
+                        std::cout << "ERROR Packet::handlePacketEncoding : std::string* information doesn't contains enough attributs" << std::endl;
+                        return;
+                    }
+                    // Write the id of the packet, the size of the username, the username, the size of the password, the password
+                    writeUint8(0);
+
+                    writeUint8(information[0].size());
+                    writeStringInPacket(information[0]);
+
+                    writeUint8(information[1].size());
+                    writeStringInPacket(information[1]);
+
+                    break;
+                }
+                case PacketType::MESSAGE:{
+                    // Write the id of the packet, the size of the message, and the message
+                    writeUint8(1);
+
+                    writeUint16(information[0].size());
+                    writeStringInPacket(information[0]);
+
+                    break;
+                }
+                default:{
+                    break;
+                }
             }
         }
 
-        std::string getInformation() const{
-            int type = this->readInPacket<int>();
-            int sizeOfInformation = this->readInPacket<int>();
-        };
+        // std::string getInformation(){
+        //     return this->readInformationInPacket();
+        // };
 
         void printPacket(){
-            std::cout 
-            << "Packet:\n  Size = " 
-            << this->readPacketSize()
-            << "\n  Container: " 
-            << this->container.data()
-            << std::endl;
+            // Save the old cursor, and put it at the start 
+            int oldCursor = this->cursor;
+            this->cursor = 0;
+
+            switch(this->readUint8()){
+                case PacketType::LOGIN:{
+                    std::cout 
+                    << "Login Packet:\n  Username : "
+                    << this->readInformationInPacket(this->readUint8())
+                    << "\n  Password : "
+                    << this->readInformationInPacket(this->readUint8())
+                    << std::endl;
+
+                    // Set it back where it was before the print
+                    this->cursor = oldCursor;
+
+                    break;
+                }
+                case PacketType::MESSAGE:{
+                    std::cout 
+                    << "Message Packet:\n  Contain the message : "
+                    << this->readInformationInPacket(this->readUint16())
+                    << std::endl;
+
+                    // Set it back where it was before the print
+                    this->cursor = oldCursor;
+
+                    break;
+                }
+                default:{
+                    std::cout << "ERROR Packet::printPacket : Unknown packet type" << std::endl;
+                    break;
+                }
+            }
         }
-
-        int readPacketSize(){
-            int decodedInt;
-            memcpy(&decodedInt, this->container.data(), sizeof(int));
-
-            return decodedInt;
-        };
 
     private:
         PacketType type;
         std::vector<unsigned char> container;
         unsigned int cursor = 0;
 
-        template<typename T>
-        void writeInPacket(const T& value){
-            const unsigned char* itemPointer = reinterpret_cast<const unsigned char*>(&value);
-        
-            this->container.insert(this->container.end(), itemPointer, itemPointer + sizeof(T));
+        void writeUint8(uint8_t value){
+            this->container.push_back(value);
+        }
+        void writeUint16(uint16_t value){
+            this->container.push_back((value >> 8) & 0xFF);
+            this->container.push_back(value & 0xFF);
+        }
+        void writeStringInPacket(std::string value){
+            this->container.insert(this->container.end(), value.begin(), value.end());
         }
 
-        template<typename T>
-        T readInPacket(){
-            T itemPointer = reinterpret_cast<T>(this->container.at(this->cursor));
-            this->cursor += sizeof(T);
+        int readIntInPacket(){
+            return int((unsigned char)(this->container.at(this->cursor++)) << 24 |
+                (unsigned char)(this->container.at(this->cursor++)) << 16 |
+                (unsigned char)(this->container.at(this->cursor++)) << 8 |
+                (unsigned char)(this->container.at(this->cursor++)));
+        }
+        uint8_t readUint8(){
+            return this->container.at(this->cursor++);
+        }
+        uint16_t readUint16(){
+            return uint16_t((unsigned char)(this->container.at(this->cursor++)) << 8 |
+                (unsigned char)(this->container.at(this->cursor++)));
+        }
+        std::string readInformationInPacket(uint16_t sizeToRead){
+            std::string toReturn(this->container.begin() + this->cursor, this->container.begin() + this->cursor + sizeToRead);
+            this->cursor += sizeToRead;
 
-            return itemPointer;
+            return toReturn;
         }
 };

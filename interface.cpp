@@ -233,12 +233,41 @@ void createWindow(){
     startRendering(window, renderer, gui);
 }
 
+int handlePacketDecoding(std::string* toSaveTo, unsigned char* toDecode){
+    switch(toDecode[0]){
+        case 0:{
+            uint8_t usernameSize = toDecode[1];
+            uint8_t passwordSize = toDecode[usernameSize + 2];
+
+            toSaveTo[0].clear();
+            toSaveTo[0].append(std::string(reinterpret_cast<char*>(toDecode + 2), usernameSize));
+            
+            toSaveTo[1].clear();
+            toSaveTo[1].append(std::string(reinterpret_cast<char*>(toDecode + usernameSize + 3), passwordSize));
+
+            return 0;
+        }
+        case 1:{
+            uint16_t messageContentSize = uint16_t(toDecode[1] << 8 | toDecode[2]);
+
+            toSaveTo[0].clear();
+            toSaveTo[0].append(std::string(reinterpret_cast<char*>(toDecode + 3), messageContentSize));
+
+            return 1;
+        }
+        default:{
+            break;
+        }
+    }
+    return -1;
+}
+
 
 int main(int argc, char* argv[]){
     try{
         asio::io_context io;
 
-        ServerHandler server(io, 12345);
+        ServerHandler server(io, 5544);
 
         io.run();
     }
@@ -246,9 +275,17 @@ int main(int argc, char* argv[]){
         std::cout << e.what() << std::endl;
     }
 
-    // Packet* test = new Packet(Packet::PacketType::MESSAGE, "Random information in the packet");
+    // std::string* informationPacketTest = new std::string[1]{"Random information in the packet that will be displayed"};
+    // Packet* test = new Packet(Packet::PacketType::MESSAGE, informationPacketTest);
     // test->printPacket();
 
+    // std::string* loginInfo = new std::string[2]{"randomUsername123", "RandomPass321"};
+    // Packet* loginTest = new Packet(Packet::PacketType::LOGIN, loginInfo);
+    // loginTest->printPacket();
+
+    // std::cout << "Before handle got : " << loginInfo[0].c_str() << " // " << loginInfo[1].c_str() << std::endl;
+    // handlePacketDecoding(loginInfo, loginTest->getContainer());
+    // std::cout << "After handle got : " << loginInfo[0].c_str() << " // " << loginInfo[1].c_str() << std::endl;
 
 
     // createWindow();
