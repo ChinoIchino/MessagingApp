@@ -20,7 +20,7 @@ class ServerHandler{
                 [this](std::error_code ec, tcp::socket socket){
                     if(!ec){
                         std::cout << "Client connected to server" << std::endl;
-                        std::shared_ptr<Session> newClient = std::make_shared<Session>(this, std::move(socket));
+                        std::shared_ptr<Session> newClient = std::make_shared<Session>(*this, std::move(socket));
                         this->clients.push_back(newClient);
                         newClient->start();
                     }
@@ -32,7 +32,7 @@ class ServerHandler{
         void broadcast(std::shared_ptr<Session> sender, Packet* packet){
             for(std::shared_ptr<Session>& client: this->clients){
                 if(client != sender){
-                    client->send(packet);
+                    client->write(packet);
                 }
             }
         }
