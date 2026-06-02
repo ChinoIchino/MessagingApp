@@ -3,6 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <asio.hpp>
 
 using asio::ip::tcp;
@@ -19,23 +20,42 @@ class ServerHandler{
             this->servAcceptor.async_accept(
                 [this](std::error_code ec, tcp::socket socket){
                     if(!ec){
-                        std::cout << "Client connected to server" << std::endl;
+                        std::cout << "Client connected to server via the ip : " << socket.remote_endpoint().address().to_string() << std::endl;
+
                         std::shared_ptr<Session> newClient = std::make_shared<Session>(*this, std::move(socket));
-                        this->clients.push_back(newClient);
+                        // this->clients.push_back(newClient);
+
+                        // std::thread clientListener(read, newClient, socket);
+                        // clientListener.detach();
+
                         newClient->start();
                     }
                     connectionListener();
                 }
             );
         }
+        
+        // void broadcast(std::shared_ptr<Session> sender, Packet* packet){
+        //     for(std::shared_ptr<Session>& client: this->clients){
+        //         if(client != sender){
+        //             client->write(packet);
+        //         }
+        //     }
+        // }
+        void handleAndBroadcast(std::vector<char> buffer){
 
-        void broadcast(std::shared_ptr<Session> sender, Packet* packet){
-            for(std::shared_ptr<Session>& client: this->clients){
-                if(client != sender){
-                    client->write(packet);
-                }
-            }
         }
+
+        bool handleAccountConnection(std::string* connectionTryInformation){
+            //TODO verify if the account exist on the database
+            std::cout << "Trying a connection" << std::endl;
+            return true;
+        }
+
+        void read(std::shared_ptr<Session> sessionToListen, tcp::socket socketOfSession){
+            
+        }
+
         
         int handlePacketDecoding(std::string* toSaveTo, unsigned char* toDecode){
             switch(toDecode[0]){
@@ -68,5 +88,7 @@ class ServerHandler{
         
     private:
         asio::ip::tcp::acceptor servAcceptor;
-        std::vector<std::shared_ptr<Session>> clients;
+        std::vector<std::vector<std::shared_ptr<Session>>> allConnectedClients;
+
+        bool isRunning = true;
 };

@@ -2,12 +2,11 @@
 
 #include "GuiElements/GuiElements.h"
 
-#include "Server/ServerHandler.h"
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <vector>
+#include <asio.hpp>
 #include <iostream>
 
 // TODO make a function that connect to a database of users
@@ -233,47 +232,31 @@ void createWindow(){
     startRendering(window, renderer, gui);
 }
 
-int handlePacketDecoding(std::string* toSaveTo, unsigned char* toDecode){
-    switch(toDecode[0]){
-        case 0:{
-            uint8_t usernameSize = toDecode[1];
-            uint8_t passwordSize = toDecode[usernameSize + 2];
-
-            toSaveTo[0].clear();
-            toSaveTo[0].append(std::string(reinterpret_cast<char*>(toDecode + 2), usernameSize));
-            
-            toSaveTo[1].clear();
-            toSaveTo[1].append(std::string(reinterpret_cast<char*>(toDecode + usernameSize + 3), passwordSize));
-
-            return 0;
-        }
-        case 1:{
-            uint16_t messageContentSize = uint16_t(toDecode[1] << 8 | toDecode[2]);
-
-            toSaveTo[0].clear();
-            toSaveTo[0].append(std::string(reinterpret_cast<char*>(toDecode + 3), messageContentSize));
-
-            return 1;
-        }
-        default:{
-            break;
-        }
-    }
-    return -1;
-}
-
-
 int main(int argc, char* argv[]){
-    try{
-        asio::io_context io;
+    asio::io_context io;
 
-        ServerHandler server(io, 5544);
+    asio::ip::tcp::socket clientSocket(io);
 
-        io.run();
-    }
-    catch (std::exception& e){
-        std::cout << e.what() << std::endl;
-    }
+    clientSocket.connect(
+        asio::ip::tcp::endpoint(
+            asio::ip::make_address("127.0.0.1"), 5544
+        )
+    );
+
+    std::cout << "Interface.cpp : Connected to server" << std::endl;
+
+    io.run();
+
+    // try{
+    //     asio::io_context io;
+
+    //     ServerHandler server(io, 5544);
+
+    //     io.run();
+    // }
+    // catch (std::exception& e){
+    //     std::cout << e.what() << std::endl;
+    // }
 
     // std::string* informationPacketTest = new std::string[1]{"Random information in the packet that will be displayed"};
     // Packet* test = new Packet(Packet::PacketType::MESSAGE, informationPacketTest);
