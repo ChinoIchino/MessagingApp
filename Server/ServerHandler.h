@@ -1,4 +1,4 @@
-#include "Session.h"
+#include "ServerSession.h"
 
 #include <ctime>
 #include <iostream>
@@ -17,18 +17,19 @@ class ServerHandler{
         ~ServerHandler(){};
 
         void connectionListener(){
+            std::cout << "starting a new connectionListener" << std::endl;
             this->servAcceptor.async_accept(
                 [this](std::error_code ec, tcp::socket socket){
                     if(!ec){
                         std::cout << "Client connected to server via the ip : " << socket.remote_endpoint().address().to_string() << std::endl;
 
-                        std::shared_ptr<Session> newClient = std::make_shared<Session>(*this, std::move(socket));
-                        // this->clients.push_back(newClient);
+                        std::shared_ptr<ServerSession> newClient = std::make_shared<ServerSession>(*this, std::move(socket));
+                        this->clientsConnected.push_back(newClient);
 
-                        // std::thread clientListener(read, newClient, socket);
-                        // clientListener.detach();
+                        std::cout << "Client added to clientsConnected list // Ammount of clients " << this->clientsConnected.size() << std::endl;
 
-                        newClient->start();
+                        std::cout << "About to start a packetListener" << std::endl;
+                        newClient->packetListener();
                     }
                     connectionListener();
                 }
@@ -52,9 +53,9 @@ class ServerHandler{
             return true;
         }
 
-        void read(std::shared_ptr<Session> sessionToListen, tcp::socket socketOfSession){
+        // void read(std::shared_ptr<ServerSession> sessionToListen, tcp::socket socketOfSession){
             
-        }
+        // }
 
         
         int handlePacketDecoding(std::string* toSaveTo, unsigned char* toDecode){
@@ -85,10 +86,21 @@ class ServerHandler{
             }
             return -1;
         }
+
+        void removeConnection(std::shared_ptr<ServerSession> connectionToRemove){
+            this->clientsConnected.erase(
+                std::remove(this->clientsConnected.begin(), this->clientsConnected.end(), connectionToRemove),
+                this->clientsConnected.end()
+            );
+
+            std::cout << "Removed a connection // Ammount of clients left " << this->clientsConnected.size() << std::endl;
+        }
+
         
     private:
         asio::ip::tcp::acceptor servAcceptor;
-        std::vector<std::vector<std::shared_ptr<Session>>> allConnectedClients;
+        std::vector<std::shared_ptr<ServerSession>> clientsConnected;
+        std::vector<std::vector<std::shared_ptr<ServerSession>>> clientsInGroup;
 
         bool isRunning = true;
 };

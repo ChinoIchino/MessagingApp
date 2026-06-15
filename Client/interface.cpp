@@ -1,6 +1,8 @@
 #define SDL_MAIN_HANDLED
 
 #include "GuiElements/GuiElements.h"
+#include "ClientSession.h"
+// #include "Packet.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -40,6 +42,15 @@ void createServer(void* arg){
     std::string passwordToServer = gui->getContainerList()[gui->getCurrentDisplayedGroup()]->getTextFieldList()[0]->getTextContainer();
 
     std::cout << "Password to server: " << passwordToServer << std::endl;
+}
+
+void createFakePacket(void* arg){
+    auto clientSession = (std::shared_ptr<ClientSession>*) arg;
+
+    Packet* packetToSend = new Packet(Packet::PacketType::MESSAGE, new std::string("Random message packet that was sent via the createFakePacket function !"));
+
+    clientSession->get()->write(packetToSend);
+    // clientSession->write(packetToSend); 
 }
 
 void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui){
@@ -82,7 +93,7 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
     SDL_Quit();
 }
 
-GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const int WINDOW_HEIGHT){
+GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const int WINDOW_HEIGHT, std::shared_ptr<ClientSession>* clientSession){
     GuiElements* gui = new GuiElements(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     
     if(TTF_Init() == -1){
@@ -161,7 +172,7 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
 
     TextField* serverPasswordTF = createServerMenuContainer->addTextField(120, 35);
     Label* serverPasswordL = createServerMenuContainer->addLabel("Password: ", 35);
-    TextButton* createServerTB = createServerMenuContainer->addTextButton(100, 35, "Create", &createServer, gui);
+    TextButton* createServerTB = createServerMenuContainer->addTextButton(100, 35, "Create", &createFakePacket, clientSession);
     TextButton* goBackServerTB = createServerMenuContainer->addTextButton(100, 35, "Go Back", &sendToMainMenu, gui);
 
     serverPasswordTF->moveTo(
@@ -184,7 +195,7 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
     return gui;
 }
 
-void createWindow(){
+void createWindow(std::shared_ptr<ClientSession>* clientSession){
     std::cout << "Main Called!" << std::endl;
     
     const int WINDOW_HEIGHT = 800;
@@ -220,7 +231,7 @@ void createWindow(){
         return;
     }
     
-    GuiElements* gui = initInterface(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    GuiElements* gui = initInterface(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, clientSession);
 
     if(!gui){
         std::cout << "initInterface returned NULL" << std::endl;
@@ -243,34 +254,12 @@ int main(int argc, char* argv[]){
         )
     );
 
+    auto clientSession = std::make_shared<ClientSession>(std::move(clientSocket));
+
     std::cout << "Interface.cpp : Connected to server" << std::endl;
 
     io.run();
 
-    // try{
-    //     asio::io_context io;
-
-    //     ServerHandler server(io, 5544);
-
-    //     io.run();
-    // }
-    // catch (std::exception& e){
-    //     std::cout << e.what() << std::endl;
-    // }
-
-    // std::string* informationPacketTest = new std::string[1]{"Random information in the packet that will be displayed"};
-    // Packet* test = new Packet(Packet::PacketType::MESSAGE, informationPacketTest);
-    // test->printPacket();
-
-    // std::string* loginInfo = new std::string[2]{"randomUsername123", "RandomPass321"};
-    // Packet* loginTest = new Packet(Packet::PacketType::LOGIN, loginInfo);
-    // loginTest->printPacket();
-
-    // std::cout << "Before handle got : " << loginInfo[0].c_str() << " // " << loginInfo[1].c_str() << std::endl;
-    // handlePacketDecoding(loginInfo, loginTest->getContainer());
-    // std::cout << "After handle got : " << loginInfo[0].c_str() << " // " << loginInfo[1].c_str() << std::endl;
-
-
-    // createWindow();
+    createWindow(&clientSession);
     return 0;
 }
