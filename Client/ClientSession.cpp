@@ -37,17 +37,16 @@ bool ClientSession::handleAccountConnection(std::string* connectionTryInformatio
 
 void ClientSession::packetListener(){
     std::cout << "Starting to listening to a session // Server folder" << std::endl;
+    
+    auto self = shared_from_this();
 
     asio::async_read(
         this->sessionSocket,
         asio::buffer(this->readBuff),
-        [this](std::error_code ec, std::size_t length){
+        [this, self](std::error_code ec, std::size_t length){
             if(!ec){
                 std::cout << "Received a packet. Starting again the packetListener function" << std::endl;
             }
-            // else{
-            //     std::cout << "PacketListener received a error code " << ec << std::endl;
-            // }
             this->packetListener();
         }
     ); 
@@ -61,7 +60,7 @@ void ClientSession::send(Packet* packet){
 }
 
 void ClientSession::write(Packet* packet){
-    auto self(shared_from_this());
+    auto self = shared_from_this();
     
     std::cout << "Got to the write function of ClientSession" << std::endl;
     packet->printPacket();

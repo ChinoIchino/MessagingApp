@@ -36,7 +36,10 @@ class Packet{
                         std::cout << "ERROR Packet::handlePacketEncoding : std::string* information doesn't contains enough attributs" << std::endl;
                         return;
                     }
-                    // Write the id of the packet, the size of the username, the username, the size of the password, the password
+                    // Write the total size, id of the packet, the size of the username, the username, the size of the password, the password
+                    std::cout << "handlePacketEncoding Login: " << (information[0].size() + information[1].size() + 5) << std::endl;
+                    writeUint16(information[0].size() + information[1].size() + 3);
+                    
                     writeUint8(0);
 
                     writeUint8(information[0].size());
@@ -48,7 +51,11 @@ class Packet{
                     break;
                 }
                 case PacketType::MESSAGE:{
-                    // Write the id of the packet, the size of the message, and the message
+                    std::cout << "handlePacketEncoding Message: " << (information[0].size() + 5) << std::endl;
+
+                    // Write the total size, id of the packet, the size of the message, and the message
+                    writeUint16(information[0].size() + 3);
+                    
                     writeUint8(1);
 
                     writeUint16(information[0].size());
@@ -57,6 +64,7 @@ class Packet{
                     break;
                 }
                 case PacketType::JOIN_GROUP:{
+                    writeUint16(information[2].size() + 7);
                     // Id of packet
                     writeUint8(2);
                     // Is he creating a lobby
@@ -82,8 +90,7 @@ class Packet{
         void printPacket(){
             // Save the old cursor, and put it at the start 
             int oldCursor = this->cursor;
-            this->cursor = 0;
-
+            this->cursor = 2;
             switch(this->readUint8()){
                 case PacketType::LOGIN:{
                     std::cout 

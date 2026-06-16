@@ -14,6 +14,7 @@ class ServerSession: public std::enable_shared_from_this<ServerSession>{
     public:
         ServerSession(ServerHandler& currServer, tcp::socket socket)
             :sessionSocket(std::move(socket)),
+            header(2),
             readBuff(1024),
             server(currServer){};
 
@@ -28,7 +29,7 @@ class ServerSession: public std::enable_shared_from_this<ServerSession>{
         
         tcp::socket sessionSocket;
         
-        const short int READ_BUFFER_SIZE = 1024;
+        std::vector<char> header;
         std::vector<char> readBuff;
         std::string decodedPacket[2];
         
