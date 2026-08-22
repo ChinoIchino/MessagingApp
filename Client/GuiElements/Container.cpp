@@ -1,8 +1,12 @@
 #include "Container.h"
 #include <iostream>
 
-Container::Container(SDL_Rect rect, bool isRounded, SDL_Color backgroundColor, SDL_Color guiElementsBackgroundColor, std::string filePathToFont, SDL_Color fontColor){
-    this->rect = rect;
+Container::Container(int windowHeight, int windowWidth, bool isRounded, SDL_Color backgroundColor, SDL_Color guiElementsBackgroundColor, std::string filePathToFont, SDL_Color fontColor)
+    : WINDOW_HEIGHT(windowHeight), WINDOW_WIDTH(windowWidth){
+
+    this->availableTopPosition = 0;
+    
+    this->rect = {0, 0, WINDOW_HEIGHT, WINDOW_WIDTH};
     this->rounded = isRounded;
 
     this->backgroundColor = backgroundColor;
@@ -145,7 +149,20 @@ std::vector<TextField*> Container::getTextFieldList() const{
 }
 TextField* Container::addTextField(int width, int height){
     TextField* toAdd = new TextField(
+        this,
         {0, 0, width, height},
+        this->guiBackgroundColor,
+        this->fontPath.c_str(),
+        fontColor
+    );
+    this->guiTextFields.push_back(toAdd);
+
+    return toAdd;
+}
+TextField* Container::addTextField(){
+    TextField* toAdd = new TextField(
+        this,
+        {0, 0, this->rect.w / 4, this->rect.h / 10},
         this->guiBackgroundColor,
         this->fontPath.c_str(),
         fontColor
@@ -160,7 +177,23 @@ std::vector<TextButton*> Container::getTextButtonsList() const{
 }
 TextButton* Container::addTextButton(int width, int height, std::string displayText, void (*reactFunction)(void* arg), void* arg){
     TextButton* toAdd = new TextButton(
+        this,
         {0, 0, width, height},
+        this->guiBackgroundColor,
+        displayText,
+        this->fontPath.c_str(),
+        this->fontColor,
+        reactFunction,
+        arg
+    );
+    this->guiTextButtons.push_back(toAdd);
+
+    return toAdd;
+}
+TextButton* Container::addTextButton(std::string displayText, void (*reactFunction)(void* arg), void* arg){
+    TextButton* toAdd = new TextButton(
+        this,
+        {0, 0, this->rect.w / 3, this->rect.h / 10},
         this->guiBackgroundColor,
         displayText,
         this->fontPath.c_str(),
@@ -178,10 +211,23 @@ std::vector<Label*> Container::getLabelsList() const{
 }
 Label* Container::addLabel(std::string displayedText, int fontSize){
     Label* toAdd = new Label(
+        this,
         {0, 0, 0, fontSize},
         displayedText,
         this->fontPath.c_str(),
         this->fontColor    
+    );
+    this->guiLabels.push_back(toAdd);
+
+    return toAdd;
+}
+Label* Container::addLabel(std::string displayedText){
+    Label* toAdd = new Label(
+        this,
+        {0, 0, 0, this->rect.h / 10},
+        displayedText,
+        this->fontPath.c_str(),
+        this->fontColor
     );
     this->guiLabels.push_back(toAdd);
 
@@ -227,6 +273,19 @@ int Container::getAbsolutePositionY(AbsolutePositionY absY){
     return 0;
 }
 
+int Container::claimTopPosition(int itemHeight, int padding){
+    int availablePos = this->availableTopPosition + padding;
+    
+    this->availableTopPosition += itemHeight + padding;
+    return availablePos;
+}
+int Container::claimTopPosition(int itemHeight){
+    int availablePos = this->availableTopPosition;
+    
+    this->availableTopPosition += itemHeight;
+    return availablePos;
+}
+
 
 void Container::setIsVisible(bool isVisible){
     this->visible = isVisible;
@@ -240,4 +299,16 @@ void Container::setHandleInput(bool isHandling){
 }
 bool Container::isHandlingInput() const{
     return this->handleInput;
+}
+
+/**
+ * NEED TO BE USED BEFORE GUI ELEMENTS ARE ADDED INTO THE CONTAINER.
+ * Change the size based on the application window size.
+ * @param height : Percentage of the application window to be used vertically
+ * @param height : Percentage of the application window to be used horizontally
+ */
+void Container::setRectSize(float height, float width){
+    this->rect = {(int)((1.0f - width) / 2 * this->WINDOW_WIDTH), (int)((1.0f - height) / 2 * this->WINDOW_HEIGHT), (int)(this->WINDOW_WIDTH * width), (int)(this->WINDOW_HEIGHT * height)};
+
+    this->availableTopPosition = this->rect.y;
 }

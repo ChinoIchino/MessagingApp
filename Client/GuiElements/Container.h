@@ -23,7 +23,8 @@ class Container{
         };
 
         Container(
-            SDL_Rect rect,
+            int windowHeight,
+            int windowWidth,
             bool isRounded,
             SDL_Color backgroundColor,
             SDL_Color guiElementsBackgroundColor,
@@ -44,6 +45,12 @@ class Container{
          * @return the TextField* that was just created and added to the container
          */
         TextField* addTextField(int width, int height);
+        /**
+         * Create and add a TextField into the container. With a chosen size based on the container size.
+         * The text field created have the position 0 0. It need then to be moved manually.
+         * @return the TextField* that was just created and added to the container
+         */
+        TextField* addTextField();
 
         std::vector<TextButton*> getTextButtonsList() const;
         /**
@@ -52,6 +59,12 @@ class Container{
          * @return the TextButton* that was just created and added to the container
          */
         TextButton* addTextButton(int width, int height, std::string displayText, void (*reactFunction)(void* arg), void* arg);
+        /**
+         * Create and add a TextButton into the container. With a chosen size based on the container size.
+         * The text button created have the position 0 0. It need then to be moved manually.
+         * @return the TextButton* that was just created and added to the container
+         */
+        TextButton* addTextButton(std::string displayText, void (*reactFunction)(void* arg), void* arg);
 
         std::vector<Label*> getLabelsList() const;
         /**
@@ -60,6 +73,12 @@ class Container{
          * @return the Label* that was just created and added to the container
          */
         Label* addLabel(std::string displayedText, int fontSize);
+        /**
+         * Create and add a Label into the container. With a chosen font size based on the container size.
+         * The label created have the position 0 0. It need then to be moved manually.
+         * @return the Label* that was just created and added to the container
+         */
+        Label* addLabel(std::string displayedText);
 
         int getCenterX();
         int getCenterY();
@@ -78,13 +97,27 @@ class Container{
         bool isHandlingInput() const;
         void setHandleInput(bool isHandling);
 
+        void setRectSize(float width, float height);
+
         int getAbsolutePositionX(AbsolutePositionX absX);
         int getAbsolutePositionY(AbsolutePositionY absY);
 
+        int claimTopPosition(int itemHeight, int padding);
+        int claimTopPosition(int itemHeight);
+        // int getMostBottomPosition(); TODO
+
     private:
+        const int WINDOW_HEIGHT;
+        const int WINDOW_WIDTH;
+
+        /**
+         * Background above the one made by GuiElements
+         */
         SDL_Rect rect;
         SDL_Color backgroundColor;
         SDL_Color guiBackgroundColor;
+
+        int availableTopPosition;
 
         SDL_Texture* leftSideOutline;
         SDL_Texture* rightSideOutline;

@@ -1,7 +1,10 @@
-#include "Label.h"
+// #include "Label.h"
+#include "Container.h"
 #include <iostream>
 
-Label::Label(SDL_Rect rect, std::string textContainer, const char* filePathToFont, SDL_Color fontColor){
+Label::Label(Container* parent, SDL_Rect rect, std::string textContainer, const char* filePathToFont, SDL_Color fontColor){
+    this->parent = parent;
+    
     this->rect = rect;
 
     this->font = TTF_OpenFont(filePathToFont, this->rect.h / 2);
@@ -70,6 +73,23 @@ void Label::setVisibility(bool isVisible){
     this->visible = isVisible;
 }
 
+Label* Label::snapToTop(int padding){
+    int width = this->rect.w;
+    int height = this->rect.h;
+
+    this->rect = {this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2, this->parent->claimTopPosition(height, padding), width, height};
+
+    return this;
+}
+Label* Label::snapToTop(){
+    int width = this->rect.w;
+    int height = this->rect.h;
+
+    this->rect = {this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2, this->parent->claimTopPosition(height), width, height};
+
+    return this;
+}
+
 void Label::moveTo(int x, int y){
     int height = this->rect.h;
     
@@ -83,7 +103,7 @@ void Label::moveTo(int x, int y){
     
     this->rect = {x, y, widthOfText, height};
 }
-void Label::snapToLeftOf(SDL_Rect rectToSnap, int padding){
+Label* Label::snapLeftOf(SDL_Rect rectToSnap, int padding){
     // std::cout << "Old label Rect: " << this->rect.x << " " << this->rect.y << " // " << this->rect.w << " " << this->rect.h << std::endl;
     int height = this->rect.h;
     
@@ -104,6 +124,9 @@ void Label::snapToLeftOf(SDL_Rect rectToSnap, int padding){
     // std::cout << "rectToSnap : " << rectToSnap.x << " " << rectToSnap.y << " // " << rectToSnap.w << " " << rectToSnap.h << std::endl;
     // std::cout << "New Label Rect: " << this->rect.x << " " << this->rect.y << " // " << this->rect.w << " " << this->rect.h << std::endl;
     // std::cout << "rectToSnap.x - offsetOfLabel : " << rectToSnap.x << " - " << offsetOfLabel << " = " << (rectToSnap.x - offsetOfLabel) << std::endl;
+
+    return this;
+
 }
 void Label::snapToRightOf(SDL_Rect rectToSnap, int padding){
     int height = this->rect.h;
@@ -158,4 +181,17 @@ void Label::snapToTopOf(SDL_Rect rectToSnap, int padding){
         widthOfText,
         height
     };
+}
+
+Label* Label::centerGroup(TextField* tf, int padding){
+    tf->moveTo(tf->getRect().x + tf->getRect().w / 2, tf->getRect().y);
+    this->snapLeftOf(tf->getRect(), 10);
+    
+    return this;
+}
+Label* Label::centerGroup(TextField* tf){
+    tf->moveTo(tf->getRect().x + tf->getRect().w / 2, tf->getRect().y);
+    this->snapLeftOf(tf->getRect(), 0);
+    
+    return this;
 }

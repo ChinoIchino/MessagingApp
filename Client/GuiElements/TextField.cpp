@@ -1,7 +1,10 @@
-#include "TextField.h"
+// #include "TextField.h"
+#include "Container.h"
 #include <iostream>
 
-TextField::TextField(SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor){
+TextField::TextField(Container* parent, SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor){
+    this->parent = parent;
+    
     this->rect = rect;
     this->backgroundColor = bgColor;
     
@@ -54,6 +57,23 @@ std::string TextField::getTextContainer() const{
 }
 SDL_Rect TextField::getRect() const{
     return this->rect;
+}
+
+TextField* TextField::snapToTop(int padding){
+    int width = this->rect.w;
+    int height = this->rect.h;
+
+    this->rect = {this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2, this->parent->claimTopPosition(height, padding), width, height};
+
+    return this;
+}
+TextField* TextField::snapToTop(){
+    int width = this->rect.w;
+    int height = this->rect.h;
+
+    this->rect = {this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2, this->parent->claimTopPosition(height), width, height};
+
+    return this;
 }
 
 void TextField::moveTo(int x, int y){

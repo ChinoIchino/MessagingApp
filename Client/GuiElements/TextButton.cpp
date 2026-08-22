@@ -1,7 +1,10 @@
-#include "TextButton.h"
+// #include "TextButton.h"
+#include "Container.h"
 #include <iostream>
 
-TextButton::TextButton(SDL_Rect rect, SDL_Color backgroundColor, std::string textContainer, const char* filePathToFont, SDL_Color fontColor, void (*reactFunction)(void* arg), void* arg){
+TextButton::TextButton(Container* parent, SDL_Rect rect, SDL_Color backgroundColor, std::string textContainer, const char* filePathToFont, SDL_Color fontColor, void (*reactFunction)(void* arg), void* arg){
+    this->parent = parent;
+
     this->rect = rect;
     this->backgroundColor = backgroundColor;
     
@@ -135,6 +138,23 @@ void TextButton::setIsVisible(bool isVisible){
 }
 void TextButton::setIsHovering(bool isHovering){
     this->hovering = isHovering;
+}
+
+TextButton* TextButton::snapToTop(int padding){
+    int width = this->rect.w;
+    int height = this->rect.h;
+
+    this->rect = {this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2, this->parent->claimTopPosition(height, padding), width, height};
+
+    return this;
+}
+TextButton* TextButton::snapToTop(){
+    int width = this->rect.w;
+    int height = this->rect.h;
+
+    this->rect = {this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2, this->parent->claimTopPosition(height), width, height};
+
+    return this;
 }
 
 void TextButton::moveTo(int x, int y){

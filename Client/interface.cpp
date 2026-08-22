@@ -113,80 +113,57 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
 
     // Login Container -------------------------------------------------
     Container* loginContainer = new Container(
-        {gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
+        WINDOW_HEIGHT,
+        WINDOW_WIDTH,
+        //{gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
         true,
         {0, 153, 76, 255} , // old color: 51, 255, 153
         guiBgColor,
         fontPath,
         fontColor
     );
+    loginContainer->setRectSize(0.5, 0.5);
     
-    TextField* usernameTF = loginContainer->addTextField(100, 35);
-    TextField* passTF = loginContainer->addTextField(100, 35);
-    Label* usernameL = loginContainer->addLabel("Username:", 35);
-    Label* passwordL = loginContainer->addLabel("Password:", 35);
-    TextButton* submitButton = loginContainer->addTextButton(100, 30, "Submit", &sendToMainMenu, gui);
-
-    usernameTF->moveTo(
-        loginContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X),
-        loginContainer->getAbsolutePositionY(Container::AbsolutePositionY::TOP_Y) + 50
-    );
-    usernameL->snapToLeftOf(usernameTF->getRect(), 10);
-    passTF->snapToBottomOf(usernameTF->getRect(), 20);
-    passwordL->snapToLeftOf(passTF->getRect(), 10);
-    submitButton->moveTo(
-        loginContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 50,
-        loginContainer->getAbsolutePositionY(Container::AbsolutePositionY::BOTTOM_Y) - 70
-    );
+    TextField* usernameTF = loginContainer->addTextField()->snapToTop(200);
+    TextField* passTF = loginContainer->addTextField()->snapToTop(20);
+    Label* usernameL = loginContainer->addLabel("Username:")->centerGroup(usernameTF, 10);
+    Label* passwordL = loginContainer->addLabel("Password:")->centerGroup(passTF, 10);
+    TextButton* submitButton = loginContainer->addTextButton("Submit", &sendToMainMenu, gui)->snapToTop(30);
 
     // Main Menu Container -------------------------------------------------
     Container* mainMenuContainer = new Container(
-        {gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
+        WINDOW_HEIGHT,
+        WINDOW_WIDTH,
+        //{gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
         true,
         {0, 153, 76, 255} , // old color: 51, 255, 153
         guiBgColor,
         fontPath,
         fontColor
     );
+    mainMenuContainer->setRectSize(0.5, 0.5);
 
-    TextButton* createGroupTB = mainMenuContainer->addTextButton(120, 35, "Create Group", &sendToCreateServerMenu, gui);
-    TextButton* joinGroupTB = mainMenuContainer->addTextButton(120, 35, "Join Group", NULL, NULL);
-    TextButton* logoutTB = mainMenuContainer->addTextButton(120, 35, "Logout", &sendToLoginMenu, gui);
-
-    createGroupTB->moveTo(
-        mainMenuContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 60,
-        mainMenuContainer->getAbsolutePositionY(Container::AbsolutePositionY::TOP_Y) + 50
-    );
-    joinGroupTB->snapToBottomOf(createGroupTB->getRect(), 25);
-    logoutTB->snapToBottomOf(joinGroupTB->getRect(), 25);
+    TextButton* createGroupTB = mainMenuContainer->addTextButton("Create Group", &sendToCreateServerMenu, gui)->snapToTop(200);
+    TextButton* joinGroupTB = mainMenuContainer->addTextButton("Join Group", NULL, NULL)->snapToTop(20);
+    TextButton* logoutTB = mainMenuContainer->addTextButton("Logout", &sendToLoginMenu, gui)->snapToTop(20);
 
     // Create Menu Container -------------------------------------------------
     Container* createServerMenuContainer = new Container(
-        {gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
+        WINDOW_HEIGHT,
+        WINDOW_WIDTH,
+        //{gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
         true,
         {0, 153, 76, 255} , // old color: 51, 255, 153
         guiBgColor,
         fontPath,
         fontColor
     );
+    createServerMenuContainer->setRectSize(0.5, 0.5);
 
-    TextField* serverPasswordTF = createServerMenuContainer->addTextField(120, 35);
-    Label* serverPasswordL = createServerMenuContainer->addLabel("Password: ", 35);
-    TextButton* createServerTB = createServerMenuContainer->addTextButton(100, 35, "Create", &createFakePacket, clientSession);
-    TextButton* goBackServerTB = createServerMenuContainer->addTextButton(100, 35, "Go Back", &sendToMainMenu, gui);
-
-    serverPasswordTF->moveTo(
-        createServerMenuContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 10,
-        createServerMenuContainer->getAbsolutePositionY(Container::AbsolutePositionY::TOP_Y) + 70
-    );
-    serverPasswordL->snapToLeftOf(serverPasswordTF->getRect(), 10);
-
-    createServerTB->moveTo(
-        createServerMenuContainer->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - 50,
-        createServerMenuContainer->getAbsolutePositionY(Container::AbsolutePositionY::BOTTOM_Y) - 100
-    );
-    goBackServerTB->snapToBottomOf(createServerTB->getRect(), 5);
-
+    TextField* serverPasswordTF = createServerMenuContainer->addTextField()->snapToTop(200);
+    Label* serverPasswordL = createServerMenuContainer->addLabel("Password: ")->centerGroup(serverPasswordTF, 10);
+    TextButton* createServerTB = createServerMenuContainer->addTextButton("Create", &createFakePacket, clientSession)->snapToTop(20);
+    TextButton* goBackServerTB = createServerMenuContainer->addTextButton("Go Back", &sendToMainMenu, gui)->snapToTop(30);
 
     gui->addContainer(loginContainer);
     gui->addContainer(mainMenuContainer);
@@ -198,8 +175,8 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
 void createWindow(std::shared_ptr<ClientSession>* clientSession){
     std::cout << "Main Called!" << std::endl;
     
-    const int WINDOW_HEIGHT = 800;
-    const int WINDOW_WIDTH = 1200;
+    const int WINDOW_HEIGHT = 1600;
+    const int WINDOW_WIDTH = 2400;
 
     if(SDL_Init(SDL_INIT_VIDEO) != 0){
         std::cout << SDL_GetError() << std::endl;

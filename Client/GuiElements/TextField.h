@@ -3,9 +3,11 @@
 #include <SDL2/SDL_image.h>
 #include <string>
 
+class Container;
+
 class TextField{
     public:
-        TextField(SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor);
+        TextField(Container* parent, SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor);
         ~TextField();
 
         void loadTextures();
@@ -31,6 +33,13 @@ class TextField{
         bool isVisible() const;
         void setIsVisible(bool isVisible);
 
+        /** Move to the topest place available inside the container
+         * @param padding : padding put on top of the item
+         */
+        TextField* snapToTop(int padding);
+        /** Move to the topest place available inside the container */
+        TextField* snapToTop();
+
         /** Move to a absolute position based on the attributs */
         void moveTo(int x, int y);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
@@ -48,6 +57,8 @@ class TextField{
         bool isInside(int x, int y);
 
     private:
+        Container* parent;
+
         /** Position and size of the TextField*/
         SDL_Rect rect;
 

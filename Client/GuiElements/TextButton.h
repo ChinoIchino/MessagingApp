@@ -4,9 +4,12 @@
 
 #include <string>
 
+class Container;
+
 class TextButton{
     public:
         TextButton(
+            Container* parent,
             SDL_Rect rect,
             SDL_Color backgroundColor,
             std::string textContainer, 
@@ -29,6 +32,13 @@ class TextButton{
         void setIsVisible(bool isVisible);
         void setIsHovering(bool isHovering);
 
+        /** Move to the topest place available inside the container
+         * @param padding : padding put on top of the item
+         */
+        TextButton* snapToTop(int padding);
+        /** Move to the topest place available inside the container */
+        TextButton* snapToTop();
+
         /** Move to a absolute position based on the attributs */
         void moveTo(int x, int y);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
@@ -44,6 +54,8 @@ class TextButton{
         /** Automatically activate the function in the reactFunction attribut */
         bool isPressed(int x, int y);
     private:
+        Container* parent;
+
         SDL_Rect rect;
         SDL_Color backgroundColor;
         SDL_Color selectedBackgroundColor;
