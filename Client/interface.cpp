@@ -86,26 +86,6 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
             gui->renderAll();
             SDL_RenderPresent(renderer);
         }
-
-        // SDL_WaitEvent(&event);
-        // switch (event.type){
-        //     case SDL_QUIT:{
-        //         running = false;
-        //         break;
-        //     }
-        //     case SDL_MOUSEMOTION:
-        //     case SDL_MOUSEBUTTONDOWN:
-        //     case SDL_TEXTINPUT:
-        //     case SDL_KEYDOWN:{
-        //         gui->handleEvent(event);
-
-        //         SDL_RenderClear(renderer);
-        //         gui->renderAll();
-        //         SDL_RenderPresent(renderer);
-                
-        //         break;
-        //     }
-        // }
     }
     
     SDL_DestroyRenderer(renderer);
@@ -167,10 +147,11 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
         fontColor
     );
     mainMenuContainer->setRectSize(0.5, 0.5);
+    mainMenuContainer->setGuiLayout(Container::GuiLayout::CENTERED);
 
-    TextButton* createGroupTB = mainMenuContainer->addTextButton("Create Group", &sendToCreateServerMenu, gui)->snapToTop(200);
-    TextButton* joinGroupTB = mainMenuContainer->addTextButton("Join Group", NULL, NULL)->snapToTop(20);
-    TextButton* logoutTB = mainMenuContainer->addTextButton("Logout", &sendToLoginMenu, gui)->snapToTop(20);
+    TextButton* createGroupTB = mainMenuContainer->addTextButton("Create Group", &sendToCreateServerMenu, gui);
+    TextButton* joinGroupTB = mainMenuContainer->addTextButton("Join Group", NULL, NULL);
+    TextButton* logoutTB = mainMenuContainer->addTextButton("Logout", &sendToLoginMenu, gui);
 
     // Create Menu Container -------------------------------------------------
     Container* createServerMenuContainer = new Container(

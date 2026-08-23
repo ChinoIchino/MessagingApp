@@ -3,11 +3,12 @@
 #include <SDL2/SDL_image.h>
 #include <string>
 
+
 class Container;
 
-class TextField{
+class TextField : public UiElement{
     public:
-        TextField(Container* parent, SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor);
+        TextField(int id, Container* parent, SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor);
         ~TextField();
 
         void loadTextures();
@@ -28,7 +29,8 @@ class TextField{
         void setIsSelected(bool isSelected);
 
         std::string getTextContainer() const;
-        SDL_Rect getRect() const;
+        SDL_Rect getRect() const override;
+        int getId() const override;
 
         bool isVisible() const;
         void setIsVisible(bool isVisible);
@@ -41,7 +43,7 @@ class TextField{
         TextField* snapToTop();
 
         /** Move to a absolute position based on the attributs */
-        void moveTo(int x, int y);
+        void moveTo(int x, int y) override;
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
         void snapToLeftOf(SDL_Rect rectToSnap, int padding);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
@@ -60,6 +62,8 @@ class TextField{
 
     private:
         Container* parent;
+
+        int id;
 
         /** Position and size of the TextField*/
         SDL_Rect rect;

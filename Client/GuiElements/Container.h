@@ -1,3 +1,4 @@
+#include "UiElement.h"
 #include "TextField.h"
 #include "TextButton.h"
 #include "Label.h"
@@ -11,6 +12,11 @@
 
 class Container{
     public:
+        enum GuiLayout{
+            DEFAULT,
+            CENTERED
+        };
+
         enum AbsolutePositionX{
             LEFT_X,
             MIDDLE_X,
@@ -99,17 +105,19 @@ class Container{
 
         void setRectSize(float width, float height);
 
+        void setGuiLayout(GuiLayout newLayout);
+
         int getAbsolutePositionX(AbsolutePositionX absX);
         int getAbsolutePositionY(AbsolutePositionY absY);
 
         int claimTopPosition(int itemHeight, int padding);
         int claimTopPosition(int itemHeight);
-        // int getMostBottomPosition(); TODO
 
-    private:
+        
+        private:
         const int WINDOW_HEIGHT;
         const int WINDOW_WIDTH;
-
+        
         /**
          * Background above the one made by GuiElements
          */
@@ -117,8 +125,11 @@ class Container{
         SDL_Color backgroundColor;
         SDL_Color guiBackgroundColor;
 
+        GuiLayout chosenLayout;
+        
+        int ammountOfItems;
         int availableTopPosition;
-
+        
         SDL_Texture* leftSideOutline;
         SDL_Texture* rightSideOutline;
         SDL_Texture* middleOutline;
@@ -129,8 +140,16 @@ class Container{
         std::vector<TextField*> guiTextFields;
         std::vector<TextButton*> guiTextButtons;
         std::vector<Label*> guiLabels;
-
+        
         bool rounded;
         bool visible;
         bool handleInput;
+
+        UiElement* searchById(int id);
+        
+        /**
+         * When a new item is added in the container and the GuiLayout isn't set to DEFAULT,
+         * the container clean and put again every gui elements to make a place for the new item.
+         */
+        void reformatGui();
 };

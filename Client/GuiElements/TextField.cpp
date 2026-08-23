@@ -2,8 +2,10 @@
 #include "Container.h"
 #include <iostream>
 
-TextField::TextField(Container* parent, SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor){
+TextField::TextField(int id, Container* parent, SDL_Rect rect, SDL_Color bgColor, const char* filePathToFont, SDL_Color fontColor){
     this->parent = parent;
+
+    this->id = id;
     
     this->rect = rect;
     this->backgroundColor = bgColor;
@@ -58,12 +60,20 @@ std::string TextField::getTextContainer() const{
 SDL_Rect TextField::getRect() const{
     return this->rect;
 }
+int TextField::getId() const{
+    return this->id;
+}
 
 TextField* TextField::snapToTop(int padding){
     int width = this->rect.w;
     int height = this->rect.h;
 
-    this->rect = {this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2, this->parent->claimTopPosition(height, padding), width, height};
+    this->rect = {
+        this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2,
+        this->parent->claimTopPosition(height, padding),
+        width,
+        height
+    };
 
     return this;
 }
@@ -71,7 +81,11 @@ TextField* TextField::snapToTop(){
     int width = this->rect.w;
     int height = this->rect.h;
 
-    this->rect = {this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2, this->parent->claimTopPosition(height), width, height};
+    this->rect = {
+        this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2,
+        this->parent->claimTopPosition(height),
+        width,
+        height};
 
     return this;
 }

@@ -2,12 +2,14 @@
 #include <SDL2/SDL_ttf.h>
 #include <string>
 
+
 class Container;
 
 /** A label without a background to display static information */
-class Label{
+class Label: public UiElement{
     public:
         Label(
+            int id,
             Container* parent,
             SDL_Rect rect,
             std::string textContainer, 
@@ -18,7 +20,8 @@ class Label{
 
         void render(SDL_Renderer* renderer);
 
-        SDL_Rect getRect() const;
+        SDL_Rect getRect() const override;
+        int getId() const override;
 
         bool isVisible() const;
         void setVisibility(bool isVisible);
@@ -27,7 +30,7 @@ class Label{
         Label* snapToTop();
 
         /** Move to a absolute position based on the attributs */
-        void moveTo(int x, int y);
+        void moveTo(int x, int y) override;
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
         Label* snapLeftOf(SDL_Rect rectToSnap, int padding);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
@@ -42,6 +45,8 @@ class Label{
 
     private:
         Container* parent;
+
+        int id;
 
         SDL_Rect rect;
         SDL_Color backgroundColor;

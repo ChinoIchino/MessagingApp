@@ -4,6 +4,9 @@
 Container::Container(int windowHeight, int windowWidth, bool isRounded, SDL_Color backgroundColor, SDL_Color guiElementsBackgroundColor, std::string filePathToFont, SDL_Color fontColor)
     : WINDOW_HEIGHT(windowHeight), WINDOW_WIDTH(windowWidth){
 
+    this->chosenLayout = GuiLayout::DEFAULT;
+
+    this->ammountOfItems = 0;
     this->availableTopPosition = 0;
     
     this->rect = {0, 0, WINDOW_HEIGHT, WINDOW_WIDTH};
@@ -149,6 +152,7 @@ std::vector<TextField*> Container::getTextFieldList() const{
 }
 TextField* Container::addTextField(int width, int height){
     TextField* toAdd = new TextField(
+        this->ammountOfItems++,
         this,
         {0, 0, width, height},
         this->guiBackgroundColor,
@@ -157,10 +161,15 @@ TextField* Container::addTextField(int width, int height){
     );
     this->guiTextFields.push_back(toAdd);
 
+    if(this->chosenLayout != GuiLayout::DEFAULT){
+        this->reformatGui();
+    }
+
     return toAdd;
 }
 TextField* Container::addTextField(){
     TextField* toAdd = new TextField(
+        this->ammountOfItems++,
         this,
         {0, 0, this->rect.w / 4, this->rect.h / 10},
         this->guiBackgroundColor,
@@ -168,6 +177,11 @@ TextField* Container::addTextField(){
         fontColor
     );
     this->guiTextFields.push_back(toAdd);
+
+    if(this->chosenLayout != GuiLayout::DEFAULT){
+        this->reformatGui();
+    }
+
 
     return toAdd;
 }
@@ -177,6 +191,7 @@ std::vector<TextButton*> Container::getTextButtonsList() const{
 }
 TextButton* Container::addTextButton(int width, int height, std::string displayText, void (*reactFunction)(void* arg), void* arg){
     TextButton* toAdd = new TextButton(
+        this->ammountOfItems++,
         this,
         {0, 0, width, height},
         this->guiBackgroundColor,
@@ -188,10 +203,15 @@ TextButton* Container::addTextButton(int width, int height, std::string displayT
     );
     this->guiTextButtons.push_back(toAdd);
 
+    if(this->chosenLayout != GuiLayout::DEFAULT){
+        this->reformatGui();
+    }
+
     return toAdd;
 }
 TextButton* Container::addTextButton(std::string displayText, void (*reactFunction)(void* arg), void* arg){
     TextButton* toAdd = new TextButton(
+        this->ammountOfItems++,
         this,
         {0, 0, this->rect.w / 3, this->rect.h / 10},
         this->guiBackgroundColor,
@@ -203,6 +223,10 @@ TextButton* Container::addTextButton(std::string displayText, void (*reactFuncti
     );
     this->guiTextButtons.push_back(toAdd);
 
+    if(this->chosenLayout != GuiLayout::DEFAULT){
+        this->reformatGui();
+    }
+
     return toAdd;
 }
 
@@ -211,6 +235,7 @@ std::vector<Label*> Container::getLabelsList() const{
 }
 Label* Container::addLabel(std::string displayedText, int fontSize){
     Label* toAdd = new Label(
+        this->ammountOfItems++,
         this,
         {0, 0, 0, fontSize},
         displayedText,
@@ -219,10 +244,15 @@ Label* Container::addLabel(std::string displayedText, int fontSize){
     );
     this->guiLabels.push_back(toAdd);
 
+    if(this->chosenLayout != GuiLayout::DEFAULT){
+        this->reformatGui();
+    }
+
     return toAdd;
 }
 Label* Container::addLabel(std::string displayedText){
     Label* toAdd = new Label(
+        this->ammountOfItems++,
         this,
         {0, 0, 0, this->rect.h / 10},
         displayedText,
@@ -230,6 +260,10 @@ Label* Container::addLabel(std::string displayedText){
         this->fontColor
     );
     this->guiLabels.push_back(toAdd);
+
+    if(this->chosenLayout != GuiLayout::DEFAULT){
+        this->reformatGui();
+    }
 
     return toAdd;
 }
@@ -312,3 +346,59 @@ void Container::setRectSize(float height, float width){
 
     this->availableTopPosition = this->rect.y;
 }
+
+void Container::setGuiLayout(GuiLayout newLayout){
+    this->chosenLayout = newLayout;
+
+    //TODO reform the scene based on the new layout
+}
+
+UiElement* Container::searchById(int id){
+    for(TextField* textField: this->guiTextFields){
+        if(id == textField->getId()){
+            return textField;
+        }
+    }
+    for(TextButton* textButton: this->guiTextButtons){
+        if(id == textButton->getId()){
+            return textButton;
+        }
+    }
+    for(Label* label: this->guiLabels){
+        if(id == label->getId()){
+            return label;
+        }
+    }
+
+    return NULL;
+}
+
+void Container::reformatGui(){
+    UiElement* currItem;
+    int gridSize = this->rect.h / this->ammountOfItems;
+    int offsetY = this->rect.y;
+
+    std::cout << "Container height: " << this->rect.h << " // grid size : " << gridSize << std::endl;
+    
+    for(int currId = 0; currId < this->ammountOfItems; currId++){
+        currItem = searchById(currId);
+        // SDL_Rect* currItem = searchById(currId);
+        if(currItem == NULL){
+            std::cout << "Didn't found anything under the id : " << currId << std::endl;
+            break;
+        }
+        currItem->moveTo(
+            this->getAbsolutePositionX(AbsolutePositionX::MIDDLE_X) - currItem->getRect().w  / 2,
+            gridSize / 2 + offsetY - currItem->getRect().h / 2
+        );
+
+        offsetY += gridSize;
+    }
+    std::cout << "Reformated the layout of the gui elements" << std::endl;
+}
+
+// TODO DELETE
+//this->rect = {
+    //this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2,
+    // this->parent->claimTopPosition(height)
+    //, width, height};

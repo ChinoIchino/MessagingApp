@@ -2,8 +2,10 @@
 #include "Container.h"
 #include <iostream>
 
-TextButton::TextButton(Container* parent, SDL_Rect rect, SDL_Color backgroundColor, std::string textContainer, const char* filePathToFont, SDL_Color fontColor, void (*reactFunction)(void* arg), void* arg){
+TextButton::TextButton(int id, Container* parent, SDL_Rect rect, SDL_Color backgroundColor, std::string textContainer, const char* filePathToFont, SDL_Color fontColor, void (*reactFunction)(void* arg), void* arg){
     this->parent = parent;
+
+    this->id = id;
 
     this->rect = rect;
     this->backgroundColor = backgroundColor;
@@ -126,8 +128,11 @@ void TextButton::renderOutline(SDL_Renderer* renderer, SDL_Texture* texLeftSide,
     SDL_RenderCopy(renderer, texRigthSide, NULL, &this->rightTexRect);
 }
 
-SDL_Rect TextButton::getRect(){
+SDL_Rect TextButton::getRect() const{
     return this->rect;
+}
+int TextButton::getId() const{
+    return this->id;
 }
 
 bool TextButton::isVisible() const{

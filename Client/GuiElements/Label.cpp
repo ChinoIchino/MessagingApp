@@ -2,8 +2,10 @@
 #include "Container.h"
 #include <iostream>
 
-Label::Label(Container* parent, SDL_Rect rect, std::string textContainer, const char* filePathToFont, SDL_Color fontColor){
+Label::Label(int id, Container* parent, SDL_Rect rect, std::string textContainer, const char* filePathToFont, SDL_Color fontColor){
     this->parent = parent;
+
+    this->id = id;
     
     this->rect = rect;
 
@@ -33,6 +35,8 @@ Label::~Label(){
 }
 
 void Label::render(SDL_Renderer* renderer){
+    // TODO change it like the TextField render
+
     // If the visibility is set to false do not render
     if(!this->visible){
         return;
@@ -64,6 +68,9 @@ void Label::render(SDL_Renderer* renderer){
 
 SDL_Rect Label::getRect() const{
     return this->rect;
+}
+int Label::getId() const{
+    return this->id;
 }
 
 bool Label::isVisible() const{

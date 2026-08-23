@@ -4,11 +4,13 @@
 
 #include <string>
 
+
 class Container;
 
-class TextButton{
+class TextButton: public UiElement{
     public:
         TextButton(
+            int id,
             Container* parent,
             SDL_Rect rect,
             SDL_Color backgroundColor,
@@ -26,7 +28,8 @@ class TextButton{
         /** Used to render related textures. Separated from the render function, because there is no reason to re-render it later*/
         void renderOutline(SDL_Renderer* renderer, SDL_Texture* leftSideOutline, SDL_Texture* rightSideOutline, SDL_Texture* middleOutline);
 
-        SDL_Rect getRect();
+        SDL_Rect getRect() const override;
+        int getId() const override;
 
         bool isVisible() const;
         void setIsVisible(bool isVisible);
@@ -40,7 +43,7 @@ class TextButton{
         TextButton* snapToTop();
 
         /** Move to a absolute position based on the attributs */
-        void moveTo(int x, int y);
+        void moveTo(int x, int y) override;
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
         void snapToLeftOf(SDL_Rect rectToSnap, int padding);
         /** Change the rect attribut based on the position of rectToSnap, padding and the instance size */
@@ -55,6 +58,8 @@ class TextButton{
         bool isPressed(int x, int y);
     private:
         Container* parent;
+
+        int id;
 
         SDL_Rect rect;
         SDL_Color backgroundColor;
