@@ -10,6 +10,7 @@
 #include <vector>
 #include <asio.hpp>
 #include <iostream>
+#include <thread>
 
 // TODO make a function that connect to a database of users
 void connectToAccount(void* arg){
@@ -62,25 +63,49 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
     SDL_Event event;
     bool running = true;
     while(running){
-        SDL_WaitEvent(&event);
-        switch (event.type){
-            case SDL_QUIT:{
-                running = false;
-                break;
-            }
-            case SDL_MOUSEMOTION:
-            case SDL_MOUSEBUTTONDOWN:
-            case SDL_TEXTINPUT:
-            case SDL_KEYDOWN:{
-                gui->handleEvent(event);
-
-                SDL_RenderClear(renderer);
-                gui->renderAll();
-                SDL_RenderPresent(renderer);
-                
-                break;
-            }
+        bool renderWaitingLineEmpty = false;
+        if(SDL_WaitEvent(&event)){
+            // Handle all the "waiting line" of events, then render all of the gui.
+            do {
+                if (event.type == SDL_QUIT) {
+                    running = false;
+                } 
+                else if (event.type == SDL_MOUSEMOTION || 
+                         event.type == SDL_MOUSEBUTTONDOWN || 
+                         event.type == SDL_TEXTINPUT || 
+                         event.type == SDL_KEYDOWN) {
+                    
+                    gui->handleEvent(event);
+                    renderWaitingLineEmpty = true;
+                }
+            } while (SDL_PollEvent(&event));
         }
+
+        if(renderWaitingLineEmpty && running){
+            SDL_RenderClear(renderer);
+            gui->renderAll();
+            SDL_RenderPresent(renderer);
+        }
+
+        // SDL_WaitEvent(&event);
+        // switch (event.type){
+        //     case SDL_QUIT:{
+        //         running = false;
+        //         break;
+        //     }
+        //     case SDL_MOUSEMOTION:
+        //     case SDL_MOUSEBUTTONDOWN:
+        //     case SDL_TEXTINPUT:
+        //     case SDL_KEYDOWN:{
+        //         gui->handleEvent(event);
+
+        //         SDL_RenderClear(renderer);
+        //         gui->renderAll();
+        //         SDL_RenderPresent(renderer);
+                
+        //         break;
+        //     }
+        // }
     }
     
     SDL_DestroyRenderer(renderer);

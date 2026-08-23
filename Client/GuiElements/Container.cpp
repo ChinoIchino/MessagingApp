@@ -124,7 +124,7 @@ bool Container::handleTextInput(std::string input, SDL_Renderer* renderer){
     for(TextField* textField: this->guiTextFields){
         if(textField->isSelected()){
             textField->addToTextContainer(input);
-            textField->render(renderer);
+            textField->updateTextState(renderer);
             return true;
         }
     }
@@ -135,7 +135,7 @@ bool Container::handleKeyInput(SDL_Keycode key, SDL_Renderer* renderer){
         if(textField->isSelected()){
             if(key == SDLK_BACKSPACE){
                 textField->removeFromTextContainer();
-                textField->render(renderer);
+                textField->updateTextState(renderer);
                 return true;
             }
         }

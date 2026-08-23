@@ -132,22 +132,38 @@ void TextField::render(SDL_Renderer* renderer){
         return;
     }
 
-    // std::cout << "TextField Render got called" << std::endl;
-    if(this->surface != nullptr){
-        SDL_FreeSurface(this->surface);
-        this->surface = nullptr;
-    }
-    if(this->texture != nullptr){
-        SDL_DestroyTexture(this->texture);
-        this->texture = nullptr;
-    }
-
     SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
     SDL_RenderFillRect(renderer, &this->rect);
 
     // If there is no text to be processed, there is no need for the function to continue
     if(this->textContainer.empty()){
         return;
+    }
+
+    if(this->texture == NULL){
+        std::cout << "TextField::render: this->texture is NULL, Stopping the render" << std::endl;
+        return;
+    }
+
+    SDL_RenderCopy(renderer, this->texture, NULL, &this->textRect);
+}
+void TextField::renderOutline(SDL_Renderer* renderer, SDL_Texture* texLeftSide, SDL_Texture* texRigthSide, SDL_Texture* texMiddleSide){
+    // Load all the textures used. 3 textures are used to avoid strange stretches of textures
+    if(texLeftSide == NULL || texRigthSide == NULL || texMiddleSide == NULL){
+        std::cout << "Error TextButton::render : One or more textures didn't loaded, stopping the render" << std::endl;
+        return;
+    }
+    
+    // Render the 3 textures on top of the TextButton rectangle
+    SDL_RenderCopy(renderer, texMiddleSide, NULL, &this->middleTexRect);
+    SDL_RenderCopy(renderer, texLeftSide, NULL, &this->leftTexRect);
+    SDL_RenderCopy(renderer, texRigthSide, NULL, &rightTexRect);
+}
+
+void TextField::updateTextState(SDL_Renderer* renderer){
+    if(this->texture != nullptr){
+        SDL_DestroyTexture(this->texture);
+        this->texture = nullptr;
     }
 
     // Get only a part of the text based on the text field size
@@ -174,38 +190,24 @@ void TextField::render(SDL_Renderer* renderer){
     if(ignoreOffset){
         offset = 0;
     }
+
     // Display the last x char based on their size
     this->surface = TTF_RenderText_Solid(this->font, visibleText.c_str(), this->fontColor);
     this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
-    
-    if(this->surface == NULL){
-        std::cout << "TextField::render: this->surface is NULL, Stopping the render" << std::endl;
-        return;
-    }
+
+    SDL_FreeSurface(this->surface);
+
     if(this->texture == NULL){
-        std::cout << "TextField::render: this->texture is NULL, Stopping the render" << std::endl;
+        std::cout << "TextField::updateTextState: this->texture is NULL, Stopping the update" << std::endl;
         return;
     }
 
-    SDL_Rect dst = {
+    this->textRect = {
         this->rect.x + offset + 5,
         this->rect.y + surface->h / 2,
         surface->w,
         surface->h
     };
-    SDL_RenderCopy(renderer, this->texture, NULL, &dst);
-}
-void TextField::renderOutline(SDL_Renderer* renderer, SDL_Texture* texLeftSide, SDL_Texture* texRigthSide, SDL_Texture* texMiddleSide){
-    // Load all the textures used. 3 textures are used to avoid strange stretches of textures
-    if(texLeftSide == NULL || texRigthSide == NULL || texMiddleSide == NULL){
-        std::cout << "Error TextButton::render : One or more textures didn't loaded, stopping the render" << std::endl;
-        return;
-    }
-    
-    // Render the 3 textures on top of the TextButton rectangle
-    SDL_RenderCopy(renderer, texMiddleSide, NULL, &this->middleTexRect);
-    SDL_RenderCopy(renderer, texLeftSide, NULL, &this->leftTexRect);
-    SDL_RenderCopy(renderer, texRigthSide, NULL, &rightTexRect);
 }
 
 /**

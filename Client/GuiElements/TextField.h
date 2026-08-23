@@ -54,6 +54,8 @@ class TextField{
         void render(SDL_Renderer* renderer);
         void renderTexture(SDL_Renderer* renderer);
 
+        void updateTextState(SDL_Renderer* renderer);
+
         bool isInside(int x, int y);
 
     private:
@@ -66,6 +68,8 @@ class TextField{
         TTF_Font* font;
         SDL_Surface* surface;
         SDL_Texture* texture;
+        
+        SDL_Rect textRect;
 
         /** Color of the text inside the TextField */
         SDL_Color fontColor;
