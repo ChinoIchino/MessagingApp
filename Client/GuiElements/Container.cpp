@@ -81,6 +81,9 @@ void Container::render(SDL_Renderer* renderer){
     for(Label* label: this->guiLabels){
         label->render(renderer);
     }
+    for(ScrollPane* scrollPane: this->guiScrollPanes){
+        scrollPane->render(renderer);
+    }
 }
 
 /** 
@@ -110,6 +113,15 @@ bool Container::handleMouseInput(int x, int y){
     }
     return result;
 }
+bool Container::handleMouseScroll(int verticalScrollAmm){
+    for(ScrollPane* scrollPane: this->guiScrollPanes){
+        if(scrollPane->isHovering()){
+            scrollPane->modifyScrollOffset(verticalScrollAmm);
+            return true;
+        }
+    }
+    return false;
+}
 bool Container::handleMouseMotion(int x, int y){
     bool result = false;
 
@@ -119,6 +131,14 @@ bool Container::handleMouseMotion(int x, int y){
             result = true;
         }else{
             textButton->setIsHovering(false);
+        }
+    }
+    for(ScrollPane* scrollPane: this->guiScrollPanes){
+        if(scrollPane->isInside(x, y)){
+            scrollPane->setIsHovering(true);
+            result = true;
+        }else{
+            scrollPane->setIsHovering(false);
         }
     }
     return result;
@@ -268,6 +288,19 @@ Label* Container::addLabel(std::string displayedText){
     return toAdd;
 }
 
+ScrollPane* Container::addScrollPane(){
+    ScrollPane* toAdd = new ScrollPane(
+        this->rect.x,
+        this->rect.y,
+        this->rect.w,
+        this->rect.h,
+        this->fontPath
+    );
+    this->guiScrollPanes.push_back(toAdd);
+
+    return toAdd;
+}
+
 int Container::getCenterX(){
     return this->rect.x;
 }
@@ -377,12 +410,9 @@ void Container::reformatGui(){
     UiElement* currItem;
     int gridSize = this->rect.h / this->ammountOfItems;
     int offsetY = this->rect.y;
-
-    std::cout << "Container height: " << this->rect.h << " // grid size : " << gridSize << std::endl;
     
     for(int currId = 0; currId < this->ammountOfItems; currId++){
         currItem = searchById(currId);
-        // SDL_Rect* currItem = searchById(currId);
         if(currItem == NULL){
             std::cout << "Didn't found anything under the id : " << currId << std::endl;
             break;
@@ -394,11 +424,4 @@ void Container::reformatGui(){
 
         offsetY += gridSize;
     }
-    std::cout << "Reformated the layout of the gui elements" << std::endl;
 }
-
-// TODO DELETE
-//this->rect = {
-    //this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2,
-    // this->parent->claimTopPosition(height)
-    //, width, height};

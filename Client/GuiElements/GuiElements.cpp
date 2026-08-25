@@ -65,8 +65,12 @@ void GuiElements::handleEvent(SDL_Event event){
             this->guiContainers[this->currentDisplayedGroup]->handleMouseMotion(event.button.x, event.button.y);
             break;
         }
+        case SDL_MOUSEWHEEL:{
+            this->guiContainers[this->currentDisplayedGroup]->handleMouseScroll(event.wheel.y);
+            break;
+        }
         default:
-            std::cout << "GuiElements::handleEvent, this event type is not handled"  << std::endl;
+            std::cout << "GuiElements::handleEvent, '" << event.type << "' event type is not handled"  << std::endl;
             break;
         };
 }

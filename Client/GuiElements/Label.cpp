@@ -47,27 +47,38 @@ void Label::render(SDL_Renderer* renderer){
         return;
     }
 
-    if(this->texture != nullptr){
-        SDL_DestroyTexture(this->texture);
-        this->texture = nullptr;
-    }
-    this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
     if(this->texture == nullptr){
-        std::cout << "Label::render: this->texture is NULL, Stopping the render" << std::endl;
-        return;
+        this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
+        if(this->texture == nullptr){
+            std::cout << "Label::render: this->texture is NULL, Stopping the render" << std::endl;
+            return;
+        }
+        // SDL_DestroyTexture(this->texture);
+        // this->texture = nullptr;
     }
+    // this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
+    // if(this->texture == nullptr){
+    //     std::cout << "Label::render: this->texture is NULL, Stopping the render" << std::endl;
+    //     return;
+    // }
 
-    SDL_Rect dst = {
-        this->rect.x + (this->rect.w - this->surface->w) / 2,
-        this->rect.y + surface->h / 2,
-        surface->w,
-        surface->h
-    };
-    SDL_RenderCopy(renderer, this->texture, NULL, &dst);
+    // SDL_Rect dst = {
+    //     this->rect.x + (this->rect.w - this->surface->w) / 2,
+    //     this->rect.y + surface->h / 2,
+    //     surface->w,
+    //     surface->h
+    // };
+    // this->rect = dst;
+    // SDL_RenderCopy(renderer, this->texture, NULL, &dst);
+
+    SDL_RenderCopy(renderer, this->texture, NULL, new SDL_Rect{this->rect.x, this->rect.y, surface->w, surface->h});
 }
 
 SDL_Rect Label::getRect() const{
     return this->rect;
+}
+SDL_Surface Label::getSurface(){
+    return *this->surface;
 }
 int Label::getId() const{
     return this->id;
@@ -78,6 +89,23 @@ bool Label::isVisible() const{
 }
 void Label::setVisibility(bool isVisible){
     this->visible = isVisible;
+}
+
+bool Label::isWrapped(){
+    return this->wrapped;
+}
+
+void Label::setWrapLength(int width){
+    if(this->surface != nullptr){
+        SDL_FreeSurface(this->surface);
+    }
+    this->surface = TTF_RenderText_Solid_Wrapped(this->font, this->textContainer.c_str(), this->fontColor, width);
+    if(this->texture != nullptr){
+        SDL_DestroyTexture(this->texture);
+    }
+    this->texture = nullptr;
+
+    this->wrapped = true;
 }
 
 Label* Label::snapToTop(int padding){

@@ -38,6 +38,10 @@ void sendToCreateServerMenu(void* arg){
     GuiElements* gui = (GuiElements*)(arg);
     gui->changeRender(GuiElements::GuiGroup::CREATEMENU_GUI_GROUP);
 }
+void sendToGroupChat(void* arg){
+    GuiElements* gui = (GuiElements*)(arg);
+    gui->changeRender(GuiElements::GuiGroup::GROUPCHAT);
+}
 void createServer(void* arg){
     GuiElements* gui = (GuiElements*)(arg);
     std::string passwordToServer = gui->getContainerList()[gui->getCurrentDisplayedGroup()]->getTextFieldList()[0]->getTextContainer();
@@ -73,7 +77,8 @@ void startRendering(SDL_Window* window, SDL_Renderer* renderer, GuiElements* gui
                 else if (event.type == SDL_MOUSEMOTION || 
                          event.type == SDL_MOUSEBUTTONDOWN || 
                          event.type == SDL_TEXTINPUT || 
-                         event.type == SDL_KEYDOWN) {
+                         event.type == SDL_KEYDOWN ||
+                         event.type == SDL_MOUSEWHEEL) {
                     
                     gui->handleEvent(event);
                     renderWaitingLineEmpty = true;
@@ -111,7 +116,7 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
     }
 
     // Shared ressource between containers
-    std::string fontPath = "Ressource/Zikketica.ttf";
+    std::string fontPath = "Ressource/FreeSans.ttf";
     SDL_Color guiBgColor = {128, 128, 128};
     SDL_Color fontColor = {255, 255, 255};
     SDL_Rect rect = {gui->getCenterX() - 100, gui->getCenterY() - 100, 200, 35};
@@ -141,7 +146,7 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
         WINDOW_WIDTH,
         //{gui->getCenterX() - 150, gui->getCenterY() - 75, 250, 245},
         true,
-        {0, 153, 76, 255} , // old color: 51, 255, 153
+        {0, 153, 76, 255}, // old color: 51, 255, 153
         guiBgColor,
         fontPath,
         fontColor
@@ -150,7 +155,7 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
     mainMenuContainer->setGuiLayout(Container::GuiLayout::CENTERED);
 
     TextButton* createGroupTB = mainMenuContainer->addTextButton("Create Group", &sendToCreateServerMenu, gui);
-    TextButton* joinGroupTB = mainMenuContainer->addTextButton("Join Group", NULL, NULL);
+    TextButton* joinGroupTB = mainMenuContainer->addTextButton("Join Group", &sendToGroupChat, gui);
     TextButton* logoutTB = mainMenuContainer->addTextButton("Logout", &sendToLoginMenu, gui);
 
     // Create Menu Container -------------------------------------------------
@@ -164,16 +169,31 @@ GuiElements* initInterface(SDL_Renderer* renderer, const int WINDOW_WIDTH, const
         fontPath,
         fontColor
     );
-    createServerMenuContainer->setRectSize(0.5, 0.5);
+    createServerMenuContainer->setRectSize(0.5f, 0.5f);
 
     TextField* serverPasswordTF = createServerMenuContainer->addTextField()->snapToTop(200);
     Label* serverPasswordL = createServerMenuContainer->addLabel("Password: ")->centerGroup(serverPasswordTF, 10);
     TextButton* createServerTB = createServerMenuContainer->addTextButton("Create", &createFakePacket, clientSession)->snapToTop(20);
     TextButton* goBackServerTB = createServerMenuContainer->addTextButton("Go Back", &sendToMainMenu, gui)->snapToTop(30);
 
+    Container* groupChatContainer = new Container(
+        WINDOW_HEIGHT,
+        WINDOW_WIDTH,
+        false,
+        {0, 153, 76, 255} , // old color: 51, 255, 153
+        guiBgColor,
+        fontPath,
+        fontColor
+    );
+    groupChatContainer->setRectSize(1.0f, 1.0f);
+
+    TextField* messageTF = groupChatContainer->addTextField(); // TODO snapToBottom
+    groupChatContainer->addScrollPane();
+
     gui->addContainer(loginContainer);
     gui->addContainer(mainMenuContainer);
     gui->addContainer(createServerMenuContainer);
+    gui->addContainer(groupChatContainer);
 
     return gui;
 }

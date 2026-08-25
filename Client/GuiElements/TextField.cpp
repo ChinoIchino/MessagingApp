@@ -10,7 +10,7 @@ TextField::TextField(int id, Container* parent, SDL_Rect rect, SDL_Color bgColor
     this->rect = rect;
     this->backgroundColor = bgColor;
     
-    this->font = TTF_OpenFont(filePathToFont, this->rect.h / 2);
+    this->font = TTF_OpenFont(filePathToFont, 50);
 
     if(!this->font){
         std::cout << "TextField font failed: "<< TTF_GetError() << std::endl;
@@ -85,7 +85,8 @@ TextField* TextField::snapToTop(){
         this->parent->getAbsolutePositionX(Container::AbsolutePositionX::MIDDLE_X) - width / 2,
         this->parent->claimTopPosition(height),
         width,
-        height};
+        height
+    };
 
     return this;
 }
@@ -171,7 +172,7 @@ void TextField::renderOutline(SDL_Renderer* renderer, SDL_Texture* texLeftSide, 
     // Render the 3 textures on top of the TextButton rectangle
     SDL_RenderCopy(renderer, texMiddleSide, NULL, &this->middleTexRect);
     SDL_RenderCopy(renderer, texLeftSide, NULL, &this->leftTexRect);
-    SDL_RenderCopy(renderer, texRigthSide, NULL, &rightTexRect);
+    SDL_RenderCopy(renderer, texRigthSide, NULL, &this->rightTexRect);
 }
 
 void TextField::updateTextState(SDL_Renderer* renderer){
@@ -189,7 +190,7 @@ void TextField::updateTextState(SDL_Renderer* renderer){
     while(!visibleText.empty()){
         TTF_SizeText(
             this->font,
-            visibleText.c_str(),
+            this->textContainer.c_str(),
             &currTextWidth,
             NULL
         );

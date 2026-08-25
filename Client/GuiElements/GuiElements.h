@@ -11,7 +11,8 @@ class GuiElements{
             LOGIN_GUI_GROUP,
             MAINMENU_GUI_GROUP,
             CREATEMENU_GUI_GROUP,
-            JOINMENU_GUI_GROUP,
+            GROUPCHAT,
+            JOINMENU_GUI_GROUP
         };
         
         GuiElements(SDL_Renderer* renderer, const int WINDOW_WIDTH, const int WINDOW_HEIGHT);

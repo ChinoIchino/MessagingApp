@@ -2,6 +2,7 @@
 #include "TextField.h"
 #include "TextButton.h"
 #include "Label.h"
+#include "ScrollPane.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -86,6 +87,8 @@ class Container{
          */
         Label* addLabel(std::string displayedText);
 
+        ScrollPane* addScrollPane();
+
         int getCenterX();
         int getCenterY();
 
@@ -93,6 +96,7 @@ class Container{
         int getHeight();
 
         bool handleMouseInput(int x, int y);
+        bool handleMouseScroll(int verticalScrollAmm);
         bool handleTextInput(std::string input, SDL_Renderer* renderer);
         bool handleKeyInput(SDL_Keycode key, SDL_Renderer* renderer);
         bool handleMouseMotion(int x, int y);
@@ -140,6 +144,7 @@ class Container{
         std::vector<TextField*> guiTextFields;
         std::vector<TextButton*> guiTextButtons;
         std::vector<Label*> guiLabels;
+        std::vector<ScrollPane*> guiScrollPanes;
         
         bool rounded;
         bool visible;

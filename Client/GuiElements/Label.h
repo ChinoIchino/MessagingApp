@@ -2,7 +2,6 @@
 #include <SDL2/SDL_ttf.h>
 #include <string>
 
-
 class Container;
 
 /** A label without a background to display static information */
@@ -21,10 +20,14 @@ class Label: public UiElement{
         void render(SDL_Renderer* renderer);
 
         SDL_Rect getRect() const override;
+        SDL_Surface getSurface();
         int getId() const override;
+
 
         bool isVisible() const;
         void setVisibility(bool isVisible);
+
+        void setWrapLength(int width);
 
         Label* snapToTop(int padding);
         Label* snapToTop();
@@ -43,6 +46,8 @@ class Label: public UiElement{
         Label* centerGroup(TextField* rect, int padding);
         Label* centerGroup(TextField* rect);
 
+        bool isWrapped();
+
     private:
         Container* parent;
 
@@ -60,4 +65,5 @@ class Label: public UiElement{
         std::string textContainer;
 
         bool visible;
+        bool wrapped = false;
 };
